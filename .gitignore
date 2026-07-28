@@ -1,0 +1,23 @@
+# Sirlar — hech qachon commit qilinmaydi
+.env
+.env.*
+!.env.example
+
+# Baza va zaxira nusxalar
+*.db
+*.db.backup-*
+*.sqlite3
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# ML artefaktlari va yuklangan hujjatlar
+data/artifacts/*.joblib
+data/pdf/*.pdf
+
+.DS_Store

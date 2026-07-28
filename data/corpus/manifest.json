@@ -1,0 +1,92 @@
+﻿[
+    {
+        "id":  "claude-overview",
+        "family":  "claude",
+        "model":  "all",
+        "title":  "Prompt engineering overview",
+        "source":  "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/overview",
+        "chars":  2558,
+        "file":  "claude-overview.md"
+    },
+    {
+        "id":  "claude-best-practices",
+        "family":  "claude",
+        "model":  "all",
+        "title":  "Claude prompting best practices",
+        "source":  "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices",
+        "chars":  59004,
+        "file":  "claude-best-practices.md"
+    },
+    {
+        "id":  "claude-fable-5",
+        "family":  "claude",
+        "model":  "fable-5",
+        "title":  "Prompting Claude Fable 5",
+        "source":  "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-fable-5",
+        "chars":  18400,
+        "file":  "claude-fable-5.md"
+    },
+    {
+        "id":  "claude-opus-5",
+        "family":  "claude",
+        "model":  "opus-5",
+        "title":  "Prompting Claude Opus 5",
+        "source":  "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5",
+        "chars":  11225,
+        "file":  "claude-opus-5.md"
+    },
+    {
+        "id":  "claude-opus-4-8",
+        "family":  "claude",
+        "model":  "opus-4-8",
+        "title":  "Prompting Claude Opus 4.8",
+        "source":  "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-4-8",
+        "chars":  15900,
+        "file":  "claude-opus-4-8.md"
+    },
+    {
+        "id":  "claude-sonnet-5",
+        "family":  "claude",
+        "model":  "sonnet-5",
+        "title":  "Prompting Claude Sonnet 5",
+        "source":  "https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-sonnet-5",
+        "chars":  15863,
+        "file":  "claude-sonnet-5.md"
+    },
+    {
+        "id":  "gpt-prompting",
+        "family":  "openai",
+        "model":  "all",
+        "title":  "ChatGPT prompting",
+        "source":  "https://learn.chatgpt.com/docs/prompting",
+        "chars":  23092,
+        "file":  "gpt-prompting.md"
+    },
+    {
+        "id":  "gpt-personalize",
+        "family":  "openai",
+        "model":  "all",
+        "title":  "ChatGPT personalization",
+        "source":  "https://learn.chatgpt.com/docs/personalize",
+        "chars":  2098,
+        "file":  "gpt-personalize.md"
+    },
+    {
+        "id":  "gpt-skills-plugins",
+        "family":  "openai",
+        "model":  "all",
+        "title":  "ChatGPT skills and plugins",
+        "source":  "https://learn.chatgpt.com/docs/skills-and-plugins",
+        "chars":  4637,
+        "file":  "gpt-skills-plugins.md"
+    },
+    {
+        "id":  "gpt-permission-modes",
+        "family":  "openai",
+        "model":  "all",
+        "title":  "ChatGPT permission modes",
+        "source":  "https://learn.chatgpt.com/docs/permission-modes",
+        "chars":  2525,
+        "file":  "gpt-permission-modes.md"
+    }
+]
