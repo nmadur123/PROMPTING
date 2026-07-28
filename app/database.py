@@ -11,7 +11,25 @@ from app.config import get_settings
 
 settings = get_settings()
 
-engine = create_async_engine(settings.database_url, echo=False, future=True)
+def _async_url(url: str) -> str:
+    """Hosting bergan URL'ni async drayverga moslaydi.
+
+    Railway, Render va Heroku `postgresql://...` (yoki eski `postgres://`)
+    ko'rinishida beradi — bu sinxron drayver. SQLAlchemy'ning async dvigateli
+    esa `postgresql+asyncpg://` kutadi va aks holda ishga tushishda yiqiladi.
+    URL'ni qo'lda tahrirlash o'rniga shu yerda to'g'rilaymiz: hosting panelidagi
+    o'zgaruvchi qanday bo'lsa shundayligicha ishlatiladi.
+    """
+    if url.startswith("postgres://"):
+        url = "postgresql://" + url[len("postgres://"):]
+    if url.startswith("postgresql://"):
+        url = "postgresql+asyncpg://" + url[len("postgresql://"):]
+    if url.startswith("sqlite://") and "+aiosqlite" not in url:
+        url = "sqlite+aiosqlite://" + url[len("sqlite://"):]
+    return url
+
+
+engine = create_async_engine(_async_url(settings.database_url), echo=False, future=True)
 SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

@@ -18,4 +18,8 @@ COPY data ./data
 RUN python -c "from app.ml.engine import engine; engine.warmup(); print(engine.stats())"
 
 EXPOSE 8010
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8010"]
+
+# Railway/Render konteynerga dinamik $PORT beradi va aynan shu portni
+# tinglamasa trafikni yo'naltira olmaydi. Lokalda $PORT bo'lmaydi — 8010.
+# JSON shaklida yozilsa $PORT kengaymaydi, shuning uchun shell shakli.
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8010}
