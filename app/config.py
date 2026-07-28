@@ -20,8 +20,8 @@ class Settings(BaseSettings):
     openrouter_api_key: str = ""
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
     openrouter_writer_model: str = "anthropic/claude-sonnet-5"
-    openrouter_app_url: str = "http://localhost:3000"
-    openrouter_app_title: str = "PROMPTING"
+    openrouter_app_url: str = "https://sys42.xyz"
+    openrouter_app_title: str = "sys42"
 
     # Sotib olish uchun aloqa. Kodda emas — o'zgarganda deploy kerak bo'lmasin.
     support_telegram: str = "its_mansurov"
@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     google_model: str = "gemini-2.5-flash"
 
     database_url: str = "sqlite+aiosqlite:///./prompting.db"
-    cors_origins: str = "http://localhost:3000"
+    cors_origins: str = "https://sys42.xyz"
     secret_key: str = "change-me"
 
     # Firebase ID tokenini tekshirish uchun yetarli — service account kaliti

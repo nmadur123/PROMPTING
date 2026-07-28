@@ -1,4 +1,4 @@
-"""PROMPTING — startup g'oyasidan tayyor texnik topshiriq va promptgacha."""
+"""sys42 — startup g'oyasidan tayyor texnik topshiriq va promptgacha."""
 
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(
-    title="PROMPTING API",
+    title="sys42 API",
     description=(
         "Startup g'oyasini tahlil qilib, stack / server / UI-UX / domen / to'lov "
         "tavsiyalarini beradi va tanlangan AI model uchun tayyor prompt yozadi."

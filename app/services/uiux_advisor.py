@@ -260,7 +260,7 @@ def advise(project_type: str, signals: dict, monthly_users: int, lang: str = "uz
         },
         # DIQQAT: quyidagi maslahatlar hali faqat o'zbekcha. Ular katalogga
         # ko'chirilmagan — `render_strategy` dan farqli o'laroq, Datum ularni
-        # ko'rsatmaydi, PROMPTING fronti esa ko'rsatadi.
+        # ko'rsatmaydi, sys42 fronti esa ko'rsatadi.
         "tips": [t.to_dict() for t in tips],
         "performance_budget": performance_budget(monthly_users),
     }
