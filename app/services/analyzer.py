@@ -8,7 +8,14 @@ from __future__ import annotations
 
 from app.ml.engine import CONFIDENCE_FLOOR, engine, extract_expected_users, extract_signals
 from app.ml.training_data import PROJECT_LABELS
-from app.services import domain_service, payment_service, server_calculator, stack_recommender, uiux_advisor
+from app.services import (
+    domain_service,
+    mobile_platform,
+    payment_service,
+    server_calculator,
+    stack_recommender,
+    uiux_advisor,
+)
 
 from app.copy import tr
 
@@ -20,8 +27,17 @@ async def analyze(
     lang: str = "uz",
     brand_hint: str = "",
     check_domains: bool = True,
+    clarifications: list[dict] | None = None,
 ) -> dict:
-    """To'liq tahlil qaytaradi (AnalyzeResponse shakli)."""
+    """To'liq tahlil qaytaradi (AnalyzeResponse shakli).
+
+    `clarifications` — aniqlashtiruvchi savollarga berilgan javoblar. Ular
+    tahlilga ta'sir qiladi: masalan mobil ilovada platforma ("Android",
+    "iOS", "ikkalasi") aynan shu javobdan bilinadi va stack shunga qarab
+    tanlanadi. Ilgari javoblar faqat promptga qo'shilardi, tahlil esa ularni
+    ko'rmasdi — natijada foydalanuvchi "faqat Android" desa ham stackda
+    kross-platforma yechimi turardi.
+    """
     prediction = engine.classifier.predict(description)
     signals = extract_signals(description)
 
@@ -36,8 +52,20 @@ async def analyze(
     server_options = server_calculator.recommend_servers(requirements, region, lang)  # type: ignore[arg-type]
     scaling = server_calculator.scaling_advice(requirements, prediction.label, lang)
 
+    # DIQQAT: faqat JAVOB matni olinadi, savol emas. Platforma savolining
+    # o'zida "Android, iOS yoki ikkalasi" degan so'zlar bor — savolni ham
+    # qo'shsak, foydalanuvchi nima javob berishidan qat'i nazar ikkala
+    # platforma topilib, natija doim "both" bo'lib chiqardi.
+    answers_text = "\n".join(
+        str(c.get("answer") or "") for c in (clarifications or [])
+    )
+    platform = mobile_platform.detect(description, answers_text)
+    is_mobile = mobile_platform.is_mobile_product(description, prediction.label)
+
     stack = stack_recommender.recommend_stack(
-        prediction.label, signals, effective_users, requirements.db_size_gb, region, lang
+        prediction.label, signals, effective_users, requirements.db_size_gb, region, lang,
+        platform=platform,
+        mobile=is_mobile,
     )
     anti = stack_recommender.anti_recommendations(prediction.label, signals, effective_users, lang)
     uiux = uiux_advisor.advise(prediction.label, signals, effective_users, lang)

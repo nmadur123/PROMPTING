@@ -178,6 +178,14 @@ async def generate_prompt(
             },
         )
 
+    # Javob berilmagan savollar tashlab yuboriladi — bo'sh satr promptga faqat
+    # shovqin qo'shadi va modelni chalg'itadi.
+    clarifications = [
+        {"question": a.question.strip(), "answer": a.answer.strip()}
+        for a in body.answers
+        if a.answer and a.answer.strip()
+    ]
+
     analysis = await analyzer.analyze(
         description=body.description,
         monthly_users=body.monthly_users,
@@ -185,6 +193,9 @@ async def generate_prompt(
         lang=body.lang,
         brand_hint=body.brand_hint,
         check_domains=body.check_domains,
+        # Javoblar tahlilga ham kerak — masalan mobil platforma stackni
+        # o'zgartiradi (Android -> Kotlin, iOS -> Swift, ikkalasi -> Flutter).
+        clarifications=clarifications,
     )
 
     ctx = prompt_builder.BuildContext(
@@ -205,13 +216,7 @@ async def generate_prompt(
         target_model=body.target_model,
         target_model_name=body.target_model_name or body.target_model,
         lang=body.lang,
-        # Javob berilmagan savollar promptga kirmaydi — bo'sh satr faqat
-        # shovqin qo'shadi va modelni chalg'itadi.
-        clarifications=[
-            {"question": a.question.strip(), "answer": a.answer.strip()}
-            for a in body.answers
-            if a.answer and a.answer.strip()
-        ],
+        clarifications=clarifications,
     )
 
     result = await prompt_builder.generate(ctx)

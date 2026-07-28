@@ -20,7 +20,7 @@ import logging
 import re
 from dataclasses import asdict, dataclass, field
 
-from app.services import llm
+from app.services import llm, mobile_platform
 from app.services.project_playbooks import get as get_playbook
 
 logger = logging.getLogger(__name__)
@@ -223,6 +223,33 @@ def _parse(raw: str) -> list[Question]:
     return out
 
 
+def _with_platform_question(
+    questions: list[Question], project_type: str, description: str, lang: str
+) -> list[Question]:
+    """Mobil loyihaga platforma savolini birinchi bo'lib qo'shadi.
+
+    Bu savol ataylab LLM'ga qoldirilmagan. Birinchidan, tizim ko'rsatmasida
+    modelga "texnologiya tanlovi haqida so'rama" deyilgan. Ikkinchidan, javob
+    stackni to'g'ridan-to'g'ri o'zgartiradi (Android -> Kotlin, iOS -> Swift,
+    ikkalasi -> Flutter), shuning uchun model ishlamay qolganda ham berilishi
+    shart — aks holda tavsiya taxminga asoslanadi.
+
+    Foydalanuvchi platformani g'oyasida allaqachon aytgan bo'lsa, savol
+    qo'shilmaydi: aytilgan narsani qayta so'rash vaqtni oladi.
+    """
+    if not mobile_platform.is_mobile_product(description, project_type):
+        return questions
+    if mobile_platform.detect(description) != "unknown":
+        return questions
+
+    text, hint, examples = mobile_platform.QUESTION.get(
+        lang, mobile_platform.QUESTION["uz"]
+    )
+    head = Question(id="platform", question=text, hint=hint, examples=list(examples))
+    # Umumiy soni chegaradan oshmasin — oxirgi savol o'rnini bo'shatadi.
+    return [head, *questions][:_MAX_QUESTIONS]
+
+
 async def ask(
     description: str,
     project_type: str,
@@ -267,7 +294,9 @@ async def ask(
         return ClarifyResult(
             project_type=project_type,
             project_title=project_title,
-            questions=_fallback_questions(lang),
+            questions=_with_platform_question(
+                _fallback_questions(lang), project_type, description, lang
+            ),
             generated_by_llm=False,
             warning=_NO_LLM_WARNING.get(lang, _NO_LLM_WARNING["uz"]),
         )
@@ -278,7 +307,9 @@ async def ask(
         return ClarifyResult(
             project_type=project_type,
             project_title=project_title,
-            questions=_fallback_questions(lang),
+            questions=_with_platform_question(
+                _fallback_questions(lang), project_type, description, lang
+            ),
             generated_by_llm=False,
             warning=_NO_LLM_WARNING.get(lang, _NO_LLM_WARNING["uz"]),
         )
@@ -286,6 +317,6 @@ async def ask(
     return ClarifyResult(
         project_type=project_type,
         project_title=project_title,
-        questions=questions,
+        questions=_with_platform_question(questions, project_type, description, lang),
         generated_by_llm=True,
     )

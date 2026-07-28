@@ -28,6 +28,7 @@ COPY: dict[str, dict[str, str]] = {
     "cat.backend":    {"uz": "Backend", "ru": "Бэкенд", "en": "Backend"},
     "cat.database":   {"uz": "Ma'lumotlar bazasi", "ru": "База данных", "en": "Database"},
     "cat.auth":       {"uz": "Autentifikatsiya", "ru": "Аутентификация", "en": "Authentication"},
+    "cat.mobile":     {"uz": "Mobil ilova", "ru": "Мобильное приложение", "en": "Mobile app"},
     "cat.realtime":   {"uz": "Realtime", "ru": "Realtime", "en": "Realtime"},
     "cat.cache":      {"uz": "Kesh", "ru": "Кеш", "en": "Cache"},
     "cat.search":     {"uz": "Qidiruv", "ru": "Поиск", "en": "Search"},
@@ -73,13 +74,51 @@ COPY: dict[str, dict[str, str]] = {
         "en": "Docs are the most-read surface and should be static; the dashboard is interactive. "
               "Split them and the docs never touch your server.",
     },
-    "why.fe.mobile": {
-        "uz": "Bitta koddan ikkala do'kon uchun ilova chiqadi — startup uchun ikki jamoa "
-              "saqlashdan arzon. Expo yangilanishni store navbatisiz yetkazadi.",
-        "ru": "Один код — приложение для обоих сторов; для стартапа это дешевле двух команд. "
-              "Expo доставляет обновление, не дожидаясь ревью стора.",
-        "en": "One codebase ships to both stores, which is cheaper than two teams at your size. "
-              "Expo pushes fixes without waiting in a store review queue.",
+    # Mobil: tanlov maqsad platformasiga bog'liq — services/mobile_platform.py
+    "why.fe.mobile.android": {
+        "uz": "Faqat Android kerak bo'lsa, kross-platforma qatlami ortiqcha: build sekinlashadi "
+              "va har bir tizim funksiyasiga ko'prik yozishga to'g'ri keladi. Kotlin — Google "
+              "rasman qo'llaydigan til, Compose bilan UI ancha kam kod bilan yoziladi.",
+        "ru": "Если нужен только Android, кросс-платформенный слой лишний: сборка медленнее, "
+              "а к каждой системной функции приходится писать мост. Kotlin — язык, официально "
+              "поддерживаемый Google, а Compose даёт UI меньшим объёмом кода.",
+        "en": "For Android alone a cross-platform layer is dead weight: slower builds and a bridge "
+              "for every system API. Kotlin is Google's officially supported language, and Compose "
+              "builds the UI in far less code.",
+    },
+    "why.fe.mobile.ios": {
+        "uz": "Faqat iOS kerak bo'lsa, Swift eng qisqa yo'l: tizimning yangi imkoniyatlari "
+              "(Face ID, Widget, Live Activity) chiqqan kuni ishlaydi — kross-platforma "
+              "kutubxonasi yetib olishini kutish shart emas. SwiftUI Apple dizayn qoidalarini "
+              "o'zi bajaradi.",
+        "ru": "Если нужен только iOS, Swift — самый короткий путь: новые возможности системы "
+              "(Face ID, виджеты, Live Activity) работают в день выхода, не дожидаясь обновления "
+              "кросс-платформенной библиотеки. SwiftUI сам соблюдает правила дизайна Apple.",
+        "en": "For iOS alone Swift is the shortest path: new platform features (Face ID, widgets, "
+              "Live Activities) work on release day instead of waiting for a cross-platform library "
+              "to catch up. SwiftUI follows Apple's design rules for you.",
+    },
+    "why.fe.mobile.both": {
+        "uz": "Ikkala do'kon kerak bo'lsa, ikkita alohida jamoa saqlash startup uchun qimmat. "
+              "Flutter bitta koddan ikkalasini yig'adi va UI'ni o'zi chizgani uchun ilova ikkala "
+              "platformada bir xil ko'rinadi — dizaynni ikki marta moslash shart emas.",
+        "ru": "Если нужны оба стора, содержать две команды для стартапа дорого. Flutter собирает "
+              "оба приложения из одного кода и сам рисует UI, поэтому вид одинаков на обеих "
+              "платформах — не нужно дважды подгонять дизайн.",
+        "en": "Shipping to both stores with two separate teams is expensive at your size. Flutter "
+              "builds both from one codebase and draws the UI itself, so the app looks identical on "
+              "both platforms without adapting the design twice.",
+    },
+    "why.fe.mobile.unknown": {
+        "uz": "Platforma hali aytilmagani uchun ikkala do'kon ko'zda tutildi. Flutter'dan keyin "
+              "bitta platformaga qisqartirish oson; teskarisi — Kotlin yoki Swift'da yozib, keyin "
+              "ikkinchi platformani qo'shish — ilovani qaytadan yozishni bildiradi.",
+        "ru": "Платформа пока не указана, поэтому расчёт сделан на оба стора. Сузить Flutter до "
+              "одной платформы легко; обратный путь — написать на Kotlin или Swift, а потом "
+              "добавить вторую платформу — означает переписать приложение заново.",
+        "en": "The platform has not been stated, so both stores are assumed. Narrowing Flutter to "
+              "one platform later is easy; the reverse — writing Kotlin or Swift first and adding "
+              "the second platform afterwards — means rewriting the app.",
     },
     "why.fe.game": {
         "uz": "O'yin sikli React'dan tashqarida ishlaydi. Aks holda har kadrda qayta render "

@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass, asdict
 
 from app.copy import tr
+from app.services import mobile_platform
 
 
 @dataclass
@@ -36,8 +37,6 @@ _FRONTEND: dict[str, tuple[str, str, list[str]]] = {
                        ["Vite + React", "SvelteKit"]),
     "devtool_api": ("Astro (docs) + Next.js (dashboard)", "why.fe.devtool",
                     ["Docusaurus", "Mintlify"]),
-    "mobile_app": ("React Native (Expo)", "why.fe.mobile",
-                   ["Flutter", "Native (Swift / Kotlin)"]),
     "game": ("Phaser 3 (2D) / Three.js (3D) + Vite", "why.fe.game",
              ["Godot (web export)", "Unity WebGL"]),
 }
@@ -45,8 +44,16 @@ _FRONTEND_DEFAULT = ("Next.js 15 (App Router) + Tailwind CSS", "why.fe.default",
                      ["Nuxt 3", "SvelteKit", "Remix"])
 
 
-def _frontend(project_type: str, lang: str) -> Choice:
-    pick, why_key, alts = _FRONTEND.get(project_type, _FRONTEND_DEFAULT)
+def _frontend(project_type: str, lang: str, platform: str = "unknown") -> Choice:
+    # Mobil ilovada tanlov loyiha turidan emas, maqsad platformasidan kelib
+    # chiqadi: Android -> Kotlin, iOS -> Swift, ikkalasi -> Flutter. Ilgari bu
+    # yerda platformadan qat'i nazar bitta javob turardi.
+    if project_type == "mobile_app":
+        pick, why_key, alts = mobile_platform.STACK.get(
+            platform, mobile_platform.STACK["unknown"]
+        )
+    else:
+        pick, why_key, alts = _FRONTEND.get(project_type, _FRONTEND_DEFAULT)
     return Choice(tr("cat.frontend", lang), pick, tr(why_key, lang), alts)
 
 
@@ -96,14 +103,31 @@ def recommend_stack(
     db_size_gb: float = 1.0,
     region: str = "global",
     lang: str = "uz",
+    platform: str = "unknown",
+    mobile: bool = False,
 ) -> list[Choice]:
-    """To'liq stack tavsiyasi — har bir qatlam uchun bitta tanlov va sabab."""
+    """To'liq stack tavsiyasi — har bir qatlam uchun bitta tanlov va sabab.
+
+    `platform` mobil ilova uchun: "android" | "ios" | "both" | "unknown".
+    `mobile` — mahsulotda mobil ilova bormi (loyiha turi `mobile_app`
+    bo'lmasa ham: "kuryerlar uchun mobil ilova" delivery_logistics deb
+    tasniflanadi, lekin mobil qatlam baribir kerak).
+    """
     choices = [
-        _frontend(project_type, lang),
+        _frontend(project_type, lang, platform),
         _backend(project_type, signals, monthly_users, lang),
         _database(project_type, signals, db_size_gb, lang),
         _auth(project_type, signals, lang),
     ]
+
+    # Loyiha turi `mobile_app` bo'lsa, mobil tanlov allaqachon frontend
+    # o'rnida turibdi. Aks holda mahsulotda ikkalasi ham bor — veb (admin
+    # panel, sayt) va mobil ilova, shuning uchun alohida qatlam qo'shiladi.
+    if mobile and project_type != "mobile_app":
+        pick, why_key, alts = mobile_platform.STACK.get(
+            platform, mobile_platform.STACK["unknown"]
+        )
+        choices.insert(1, Choice(tr("cat.mobile", lang), pick, tr(why_key, lang), alts))
 
     if signals.get("realtime"):
         choices.append(Choice(tr("cat.realtime", lang), "Socket.IO + Redis Pub/Sub",
