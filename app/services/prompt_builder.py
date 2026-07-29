@@ -1247,6 +1247,9 @@ async def generate(ctx: BuildContext) -> GeneratedPrompt:
             messages,
             max_tokens=_PROMPT_MAX_TOKENS,
             temperature=0.3,
+            # Mahsulotning o'zi shu matn — eng kuchli zanjir shu yerga
+            # yo'naltiriladi. Savollar (clarifier) esa arzon zanjirda qoladi.
+            heavy=True,
         )
         text = (text or "").strip()
         logger.info("Prompt %s orqali qayta yozildi", provider)

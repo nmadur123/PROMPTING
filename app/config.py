@@ -29,9 +29,21 @@ class Settings(BaseSettings):
     # --- LLM provayderlari ---
     # Tartib muhim: birinchisi ishlamasa keyingisiga o'tiladi. Bittasining
     # krediti tugashi butun mahsulotni to'xtatib qo'ymasligi uchun.
+    #
+    # Ikkita zanjir bor, chunki ikki xil ish bir xil narxga arzimaydi:
+    #   llm_providers       — arzon/tez ish: aniqlashtiruvchi savollar.
+    #   llm_providers_heavy — asosiy ish: to'liq texnik topshiriq yozish.
+    #
+    # Og'ir zanjirda Claude birinchi turadi — TT sifati mahsulotning o'zi.
+    # Savollar uchun esa Gemini/OpenRouter yetarli va bir necha barobar arzon.
     llm_providers: str = "openrouter,google"
+    llm_providers_heavy: str = "anthropic,openrouter,google"
+
     google_api_key: str = ""
     google_model: str = "gemini-2.5-flash"
+
+    anthropic_api_key: str = ""
+    anthropic_model: str = "claude-opus-5"
 
     database_url: str = "sqlite+aiosqlite:///./prompting.db"
     cors_origins: str = "https://sys42.xyz,https://www.sys42.xyz,https://pr-nu-three.vercel.app"

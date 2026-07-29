@@ -1,16 +1,21 @@
 """Ko'p provayderli LLM qatlami — biri ishlamasa ikkinchisiga o'tadi.
 
 Nega kerak: bitta provayderning krediti tugashi butun mahsulotni to'xtatib
-qo'yardi. Endi OpenRouter tugasa Google (Gemini), Google tugasa OpenRouter
+qo'yardi. Endi Claude tugasa OpenRouter, OpenRouter tugasa Google (Gemini)
 ishlaydi. Tartib sozlamadan olinadi.
 
-Ikkala provayder ham ishlamasa `LLMError` ko'tariladi va yuqoridagi kod
+Ikkita zanjir bor — `complete(heavy=True)` va `complete()`. Sababi iqtisodiy:
+to'liq texnik topshiriq yozish (o'n minglab token, mahsulotning o'zi) va
+beshta qisqa savol berish bir xil narxdagi modelga arzimaydi. Og'ir ish
+Claude'ga, yengili Gemini/OpenRouterga ketadi.
+
+Barcha provayderlar ishlamasa `LLMError` ko'tariladi va yuqoridagi kod
 o'zining zaxirasiga o'tadi (savollar uchun statik ro'yxat, prompt uchun
 deterministik skelet) — ya'ni mahsulot baribir javob beradi.
 
 Xabar formati OpenAI uslubida (`[{"role": ..., "content": ...}]`), chunki kod
-allaqachon shunga qurilgan. Gemini boshqa format kutadi, shuning uchun
-`_to_gemini()` tarjima qiladi.
+allaqachon shunga qurilgan. Gemini ham, Anthropic ham boshqa format kutadi —
+`_to_gemini()` va `_to_anthropic()` tarjima qiladi.
 """
 
 from __future__ import annotations
@@ -27,6 +32,13 @@ logger = logging.getLogger(__name__)
 
 _TIMEOUT = httpx.Timeout(180.0, connect=15.0)
 _GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta"
+
+# Claude Opus 5 da fikrlash (thinking) sukut bo'yicha yoqilgan va u ham
+# `max_tokens` ichidan yeydi. Chaqiruvchi 12 000 token so'rasa, shuncha joy
+# fikrlashga ketib javob yarmida uzilishi mumkin — shuning uchun so'ralgan
+# chegaraga qo'shimcha joy beramiz.
+_ANTHROPIC_THINKING_HEADROOM = 12_000
+_ANTHROPIC_MAX_TOKENS_CAP = 64_000
 
 
 class LLMError(RuntimeError):
@@ -114,6 +126,85 @@ async def _complete_google(
 
 
 # --------------------------------------------------------------------------- #
+# Anthropic (Claude)
+# --------------------------------------------------------------------------- #
+
+
+def _to_anthropic(messages: list[dict]) -> tuple[str, list[dict]]:
+    """OpenAI uslubidagi xabarlarni Anthropic formatiga o'giradi.
+
+    Gemini'dagi kabi, `system` alohida maydonga chiqadi — Anthropic uni
+    `messages` ichida qabul qilmaydi.
+    """
+    system_parts: list[str] = []
+    contents: list[dict] = []
+
+    for m in messages:
+        role = m.get("role")
+        text = str(m.get("content") or "")
+        if not text:
+            continue
+        if role == "system":
+            system_parts.append(text)
+        else:
+            contents.append({
+                "role": "assistant" if role == "assistant" else "user",
+                "content": text,
+            })
+
+    return "\n\n".join(system_parts), contents
+
+
+async def _complete_anthropic(messages: list[dict], max_tokens: int) -> str:
+    settings = get_settings()
+    if not settings.anthropic_api_key:
+        raise LLMError("ANTHROPIC_API_KEY sozlanmagan")
+
+    # Import shu yerda: kalit qo'yilmagan o'rnatishlarda `anthropic` paketi
+    # bo'lmasa ham qolgan provayderlar ishlayversin.
+    try:
+        import anthropic
+    except ImportError as exc:  # pragma: no cover — faqat to'liqsiz o'rnatishda
+        raise LLMError("`anthropic` paketi o'rnatilmagan") from exc
+
+    system, contents = _to_anthropic(messages)
+    if not contents:
+        raise LLMError("Claude uchun bo'sh so'rov")
+
+    client = anthropic.AsyncAnthropic(api_key=settings.anthropic_api_key)
+    try:
+        # Oqim (stream) shart: katta `max_tokens` da oddiy so'rov HTTP
+        # taymautiga urilib uziladi. `get_final_message()` to'liq javobni
+        # yig'ib beradi — hodisalarni qo'lda ushlash kerak emas.
+        #
+        # `temperature` ataylab berilmagan: Opus 5 uni qabul qilmaydi (400).
+        async with client.messages.stream(
+            model=settings.anthropic_model,
+            max_tokens=min(max_tokens + _ANTHROPIC_THINKING_HEADROOM, _ANTHROPIC_MAX_TOKENS_CAP),
+            system=system or anthropic.NOT_GIVEN,
+            messages=contents,
+            output_config={"effort": "high"},
+        ) as stream:
+            message = await stream.get_final_message()
+    except anthropic.APIStatusError as exc:
+        raise LLMError(f"Claude xatosi {exc.status_code}: {str(exc)[:300]}") from exc
+    except anthropic.APIError as exc:
+        raise LLMError(f"Claude'ga ulanib bo'lmadi: {exc}") from exc
+
+    # Xavfsizlik tasnifagichi so'rovni rad etsa javob HTTP 200 bo'ladi-yu,
+    # `content` bo'sh keladi. `content[0]` ga to'g'ridan-to'g'ri murojaat
+    # qilinsa shu yerda IndexError bo'lardi.
+    if message.stop_reason == "refusal":
+        category = getattr(message.stop_details, "category", None) or "noma'lum"
+        raise LLMError(f"Claude so'rovni rad etdi (turkum: {category})")
+
+    text = "".join(b.text for b in message.content if b.type == "text").strip()
+    if not text:
+        raise LLMError(f"Claude bo'sh javob qaytardi (stop_reason: {message.stop_reason})")
+    return text
+
+
+# --------------------------------------------------------------------------- #
 # OpenRouter
 # --------------------------------------------------------------------------- #
 
@@ -148,20 +239,28 @@ async def complete(
     max_tokens: int = 1500,
     temperature: float = 0.4,
     min_useful: Optional[int] = None,
+    heavy: bool = False,
 ) -> tuple[str, str]:
     """Birinchi ishlagan provayderning javobini qaytaradi.
 
     Qaytaradi: `(matn, provayder_nomi)`. Provayder nomi jurnalga va interfeysga
     kerak — foydalanuvchi javobni kim yozganini bilishi mumkin.
 
+    `heavy=True` — asosiy ish (to'liq texnik topshiriq). Kuchliroq va
+    qimmatroq zanjir ishlatiladi. Standart `False` — qisqa yordamchi
+    so'rovlar arzon modelga ketadi.
+
     Barcha provayderlar ishlamasa `LLMError` ko'tariladi.
     """
     settings = get_settings()
-    order = [p.strip().lower() for p in settings.llm_providers.split(",") if p.strip()]
+    raw_order = settings.llm_providers_heavy if heavy else settings.llm_providers
+    order = [p.strip().lower() for p in raw_order.split(",") if p.strip()]
     errors: list[str] = []
 
     for provider in order:
         try:
+            if provider in ("anthropic", "claude"):
+                return await _complete_anthropic(messages, max_tokens), "anthropic"
             if provider == "openrouter":
                 return await _complete_openrouter(messages, max_tokens, temperature, min_useful), provider
             if provider in ("google", "gemini"):
