@@ -126,6 +126,70 @@ async def _complete_google(
 
 
 # --------------------------------------------------------------------------- #
+# TokenMix — bitta kalit ostida ko'p provayder (OpenAI-mos)
+# --------------------------------------------------------------------------- #
+
+
+async def _complete_tokenmix(
+    messages: list[dict],
+    max_tokens: int,
+    temperature: float,
+    heavy: bool,
+) -> str:
+    """OpenAI-mos `/chat/completions`. Xabar formati tarjimasiz ketadi.
+
+    Og'ir va yengil ish uchun ikki xil model: birinchisi mahsulotning o'zini
+    yozadi, ikkinchisi qisqa yordamchi so'rovlarga javob beradi. Bitta hisob
+    ostida ikkalasi ham bo'lgani uchun zanjirning boshida turadi.
+    """
+    settings = get_settings()
+    key = settings.tokenmix_api_key
+    if not key:
+        raise LLMError("TOKENMIX_API_KEY sozlanmagan")
+
+    model = settings.tokenmix_model if heavy else settings.tokenmix_model_light
+    url = f"{settings.tokenmix_base_url.rstrip('/')}/chat/completions"
+
+    try:
+        async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
+            resp = await client.post(
+                url,
+                headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
+                json={
+                    "model": model,
+                    "messages": messages,
+                    "max_tokens": max_tokens,
+                    "temperature": temperature,
+                },
+            )
+    except httpx.HTTPError as exc:
+        raise LLMError(f"TokenMix'ga ulanib bo'lmadi: {exc}") from exc
+
+    if resp.status_code != 200:
+        # Eng ko'p uchraydigan xato — kalitga model ruxsati berilmagan. Uni
+        # ajratib aytamiz, aks holda "400 Bad Request" deb qolib, sozlama
+        # muammosini kod xatosidan farqlash qiyin bo'ladi.
+        body = resp.text[:300]
+        if "not allowed to access" in body:
+            raise LLMError(
+                f"TokenMix: kalitga `{model}` modeliga ruxsat berilmagan "
+                "(dashboard -> API key -> Models)"
+            )
+        raise LLMError(f"TokenMix xatosi {resp.status_code}: {body}")
+
+    data = resp.json()
+    choices = data.get("choices") or []
+    if not choices:
+        raise LLMError(f"TokenMix bo'sh javob qaytardi: {str(data)[:200]}")
+
+    text = ((choices[0].get("message") or {}).get("content") or "").strip()
+    if not text:
+        finish = choices[0].get("finish_reason")
+        raise LLMError(f"TokenMix bo'sh matn qaytardi (finish_reason: {finish})")
+    return text
+
+
+# --------------------------------------------------------------------------- #
 # Anthropic (Claude)
 # --------------------------------------------------------------------------- #
 
@@ -259,6 +323,8 @@ async def complete(
 
     for provider in order:
         try:
+            if provider == "tokenmix":
+                return await _complete_tokenmix(messages, max_tokens, temperature, heavy), provider
             if provider in ("anthropic", "claude"):
                 return await _complete_anthropic(messages, max_tokens), "anthropic"
             if provider == "openrouter":

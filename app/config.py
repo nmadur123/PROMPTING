@@ -36,14 +36,22 @@ class Settings(BaseSettings):
     #
     # Og'ir zanjirda Claude birinchi turadi — TT sifati mahsulotning o'zi.
     # Savollar uchun esa Gemini/OpenRouter yetarli va bir necha barobar arzon.
-    llm_providers: str = "openrouter,google"
-    llm_providers_heavy: str = "anthropic,openrouter,google"
+    llm_providers: str = "tokenmix,openrouter,google"
+    llm_providers_heavy: str = "tokenmix,anthropic,openrouter,google"
 
     google_api_key: str = ""
     google_model: str = "gemini-2.5-flash"
 
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-opus-5"
+
+    # TokenMix — bitta kalit ostida ko'p provayder (OpenAI-mos API).
+    # Shu sababdan ikkala zanjirning boshida turadi: og'ir ish uchun Claude,
+    # yengili uchun arzon model — ikkalasi ham shu bitta hisobdan.
+    tokenmix_api_key: str = ""
+    tokenmix_base_url: str = "https://api.tokenmix.ai/v1"
+    tokenmix_model: str = "claude-opus-5"
+    tokenmix_model_light: str = "gemini-2.5-flash"
 
     database_url: str = "sqlite+aiosqlite:///./prompting.db"
     cors_origins: str = "https://sys42.xyz,https://www.sys42.xyz,https://pr-nu-three.vercel.app"
