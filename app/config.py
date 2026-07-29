@@ -34,7 +34,18 @@ class Settings(BaseSettings):
     google_model: str = "gemini-2.5-flash"
 
     database_url: str = "sqlite+aiosqlite:///./prompting.db"
-    cors_origins: str = "https://sys42.xyz"
+    cors_origins: str = "https://sys42.xyz,https://www.sys42.xyz,https://pr-nu-three.vercel.app"
+
+    # Vercel har bir deploy uchun yangi domen yasaydi
+    # (`pr-git-main-xxx.vercel.app`, `pr-a1b2c3.vercel.app` ...). Ularni
+    # qo'lda CORS_ORIGINS ga qo'shib borish imkonsiz — har preview deploydan
+    # keyin backend .env ini yangilash kerak bo'lardi. Shuning uchun shu
+    # loyihaning Vercel domenlari naqsh bo'yicha ruxsat etiladi.
+    #
+    # Naqsh ataylab tor: faqat `pr-...vercel.app`. Butun `*.vercel.app` ga
+    # ochib qo'yish begona saytlarga ham API ni ochib berardi.
+    cors_origin_regex: str = r"https://pr-[a-z0-9-]*\.vercel\.app"
+
     secret_key: str = "change-me"
 
     # Firebase ID tokenini tekshirish uchun yetarli — service account kaliti

@@ -58,6 +58,14 @@ def _check_production_config() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     _check_production_config()
+    # CORS xatosi brauzerda "No Access-Control-Allow-Origin" deb ko'rinadi va
+    # server tomonda hech qanday iz qoldirmaydi. Ro'yxatni startda yozib
+    # qo'yamiz — keyingi safar log'dan darrov ko'rinadi.
+    logger.info(
+        "CORS ruxsati: %s | regex: %s",
+        settings.cors_list,
+        settings.cors_origin_regex or "(yo'q)",
+    )
     await init_db()
     # ML modelini oldindan yuklaymiz — birinchi foydalanuvchi kutmasin.
     try:
@@ -81,6 +89,9 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_list,
+    # Ro'yxatga tushmagan, lekin naqshga mos domenlar (Vercel preview
+    # deploylari) ham o'tsin — batafsil izoh `config.cors_origin_regex` da.
+    allow_origin_regex=settings.cors_origin_regex or None,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
