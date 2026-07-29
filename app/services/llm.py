@@ -166,14 +166,19 @@ async def _complete_tokenmix(
         raise LLMError(f"TokenMix'ga ulanib bo'lmadi: {exc}") from exc
 
     if resp.status_code != 200:
-        # Eng ko'p uchraydigan xato — kalitga model ruxsati berilmagan. Uni
-        # ajratib aytamiz, aks holda "400 Bad Request" deb qolib, sozlama
-        # muammosini kod xatosidan farqlash qiyin bo'ladi.
+        # Ikkita sozlama muammosi eng ko'p uchraydi va ikkalasi ham oddiy
+        # HTTP xatosiga o'xshab keladi. Ajratib aytmasak, jurnalda "400 Bad
+        # Request" turadi-yu, nima qilish kerakligi ko'rinmaydi.
         body = resp.text[:300]
         if "not allowed to access" in body:
             raise LLMError(
                 f"TokenMix: kalitga `{model}` modeliga ruxsat berilmagan "
                 "(dashboard -> API key -> Models)"
+            )
+        if "promotional credits" in body or "insufficient_quota" in body:
+            raise LLMError(
+                f"TokenMix: `{model}` promo kreditda ishlamaydi, pullik balans kerak "
+                "(tokenmix.ai/dashboard/credits)"
             )
         raise LLMError(f"TokenMix xatosi {resp.status_code}: {body}")
 

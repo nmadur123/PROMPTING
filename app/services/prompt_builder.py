@@ -1212,10 +1212,15 @@ class GeneratedPrompt:
 # Model ishlamaganda foydalanuvchi ko'radigan yagona jumla. Texnik sabab
 # jurnalda qoladi: xato matnini ekranga chiqarish odamga hech narsa bermaydi,
 # faqat mahsulot buzilgandek ko'rsatadi.
+# Ilgari bu xabar "prompt shablondan yig'ildi, u ham to'liq va ishlatishga
+# tayyor" derdi. Bu chalg'itardi: foydalanuvchi AI qayta yozgan variantni
+# olyapman deb o'ylab, aslida shablonni olardi va nega sifat pastligini
+# tushunmasdi. Endi sabab ochiq aytiladi — shablon baribir beriladi, lekin
+# uni to'liq qiymatli natija deb ko'rsatmaymiz.
 _FALLBACK_NOTE = {
-    "uz": "Model javob bermadi, shuning uchun prompt shablondan yig'ildi. U ham to'liq va ishlatishga tayyor.",
-    "ru": "Модель не ответила, поэтому промпт собран из шаблона. Он полный и готов к использованию.",
-    "en": "The model did not respond, so this prompt was built from the template. It is complete and ready to use.",
+    "uz": "AI xizmati vaqtinchalik ishlamayapti. Shablon asosidagi variant berildi — biroz keyin qayta urinib ko'ring.",
+    "ru": "AI-сервис временно не работает. Выдан вариант на основе шаблона — попробуйте позже.",
+    "en": "The AI service is temporarily unavailable. A template-based version was returned — please try again later.",
 }
 
 # Qayta yozish bo'limlarni yo'qotgan holat — foydalanuvchi to'liq variantni oladi.

@@ -30,6 +30,10 @@ def calls(monkeypatch):
     monkeypatch.setattr(
         settings, "llm_providers_heavy", "tokenmix,anthropic,openrouter,google", raising=False
     )
+    # DIQQAT: bu yerdagi zanjir standart sozlama EMAS — `anthropic` ataylab
+    # qo'shilgan, chunki testlar zanjir *tartibini* tekshiradi va buning
+    # uchun uch xil provayder kerak. Ishlab turgan standart zanjirni
+    # `test_default_chains_have_no_anthropic` qulflaydi.
 
     async def tokenmix(messages, max_tokens, temperature, heavy):
         seen.append(f"tokenmix:{'heavy' if heavy else 'light'}")
@@ -217,3 +221,42 @@ async def test_tokenmix_without_key_raises(monkeypatch):
 
     with pytest.raises(llm.LLMError, match="TOKENMIX_API_KEY"):
         await llm._complete_tokenmix(_MSG, 100, 0.3, heavy=True)
+
+
+async def test_tokenmix_promotional_credit_gives_actionable_message(monkeypatch):
+    """Promo kredit xatosi ruxsat xatosidan farqlansin — yechimi boshqa."""
+    settings = llm.get_settings()
+    monkeypatch.setattr(settings, "tokenmix_api_key", "sk-tm-test", raising=False)
+    _patch_httpx(monkeypatch, _FakeResponse(
+        400,
+        text='{"error":{"message":"This model is not available with promotional '
+             'credits. Your paid balance: $0.0000 USD","type":"insufficient_quota"}}',
+    ))
+
+    with pytest.raises(llm.LLMError) as exc:
+        await llm._complete_tokenmix(_MSG, 100, 0.3, heavy=True)
+    assert "pullik balans" in str(exc.value)
+    assert "ruxsat berilmagan" not in str(exc.value)
+
+
+async def test_tokenmix_uses_same_model_for_both_chains():
+    """Hozirgi sozlama: kalitda ruxsat berilgan yagona model `kimi-k3`.
+
+    Ikkalasi ham shunga qaratilgan; biri o'zgarib qolsa test aytadi.
+    """
+    settings = llm.get_settings()
+    assert settings.tokenmix_model == settings.tokenmix_model_light
+
+
+def test_default_chains_have_no_anthropic():
+    """Claude TokenMix orqali olinadi — to'g'ridan-to'g'ri zanjirda emas.
+
+    Sozlama `.env` dan ustidan yozilishi mumkin, shuning uchun kodning
+    O'ZIDAGI standart qiymat tekshiriladi.
+    """
+    from app.config import Settings
+
+    defaults = Settings.model_fields
+    assert "anthropic" not in defaults["llm_providers_heavy"].default
+    assert "anthropic" not in defaults["llm_providers"].default
+    assert defaults["llm_providers_heavy"].default.startswith("tokenmix")
