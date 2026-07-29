@@ -185,11 +185,15 @@ PROJECT_TRAINING: list[tuple[str, str]] = [
 ]
 
 
-# Uzun, realistik misollar alohida faylda — ular real foydalanuvchi yozuviga
-# yaqin va chalkashadigan sinflarni ajratadi. Ikkalasi birga o'qitiladi.
+# Uzun, realistik misollar alohida fayllarda — ular real foydalanuvchi
+# yozuviga yaqin va chalkashadigan sinflarni ajratadi. Hammasi birga o'qitiladi.
+#
+# `_v2` — baholash natijasiga qarab yozilgan chegara misollari; nima uchun
+# aynan shunday yozilgani o'sha faylning boshida tushuntirilgan.
 from app.ml.training_data_extra import PROJECT_TRAINING_EXTRA  # noqa: E402
+from app.ml.training_data_v2 import PROJECT_TRAINING_V2  # noqa: E402
 
-PROJECT_TRAINING = PROJECT_TRAINING + PROJECT_TRAINING_EXTRA
+PROJECT_TRAINING = PROJECT_TRAINING + PROJECT_TRAINING_EXTRA + PROJECT_TRAINING_V2
 
 
 # Yorliq -> odam oʻqiy oladigan nom (uz / ru / en).

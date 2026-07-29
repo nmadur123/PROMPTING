@@ -71,22 +71,34 @@ class ProjectClassifier:
         self.vectorizer = vectorizer
         self.model = model
 
-    @classmethod
-    def train(cls) -> "ProjectClassifier":
-        texts = [normalize(t) for t, _ in PROJECT_TRAINING]
-        labels = [l for _, l in PROJECT_TRAINING]
+    @staticmethod
+    def build_pipeline() -> tuple[FeatureUnion, LogisticRegression]:
+        """O'qitilmagan vektorizator va model — YAGONA manba.
+
+        Baholash skripti ham shu yerdan oladi. Ilgari konfiguratsiya har bir
+        skriptda qo'lda takrorlanardi: birini tuzatib ikkinchisini unutish
+        kifoya edi va o'lchov production'dagi modeldan boshqa narsani
+        o'lchay boshlardi — buni sezish deyarli imkonsiz.
+        """
         # char_wb + word birlashmasi: char n-gram til aralashganda (uz+ru+en) va
         # o'zbek morfologiyasida ishonchli, word n-gram esa "komissiya",
         # "sertifikat" kabi sinfni aniq ajratuvchi atamalarni ushlaydi.
-        # Konfiguratsiya scripts/tune_classifier.py bilan tanlangan (CV ~83%).
+        # Konfiguratsiya scripts/tune_classifier.py bilan tanlangan.
         vectorizer = FeatureUnion([
             ("char", TfidfVectorizer(analyzer="char_wb", ngram_range=(2, 5), min_df=1, sublinear_tf=True)),
             ("word", TfidfVectorizer(analyzer="word", ngram_range=(1, 2), min_df=1, sublinear_tf=True)),
         ])
-        X = vectorizer.fit_transform(texts)
         # LinearSVC bir oz aniqroq, lekin ehtimollik bermaydi — ishonch darajasi
         # va muqobil variantlar UI uchun kerak, shuning uchun LogisticRegression.
         model = LogisticRegression(max_iter=4000, C=30.0)
+        return vectorizer, model
+
+    @classmethod
+    def train(cls) -> "ProjectClassifier":
+        texts = [normalize(t) for t, _ in PROJECT_TRAINING]
+        labels = [l for _, l in PROJECT_TRAINING]
+        vectorizer, model = cls.build_pipeline()
+        X = vectorizer.fit_transform(texts)
         model.fit(X, labels)
         return cls(vectorizer, model)
 
