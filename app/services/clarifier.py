@@ -20,6 +20,8 @@ import logging
 import re
 from dataclasses import asdict, dataclass, field
 
+from app.config import get_settings
+from app.ml.engine import extract_signals
 from app.services import llm, mobile_platform
 from app.services.project_playbooks import get as get_playbook
 
@@ -106,6 +108,163 @@ _NO_LLM_WARNING = {
 def _fallback_questions(lang: str) -> list[Question]:
     rows = _FALLBACK.get(lang, _FALLBACK["uz"])
     return [Question(id=f"q{i + 1}", question=q, hint=h) for i, (q, h) in enumerate(rows)]
+
+
+# --------------------------------------------------------------------------- #
+# Signalga bog'langan savollar (LLM'siz)
+# --------------------------------------------------------------------------- #
+#
+# Yuqoridagi `_FALLBACK` har qanday g'oyaga bir xil beshta savolni berardi —
+# "maqsadli auditoriyangiz kim" darajasidagi foyda. Bu yerda savollar ML yadro
+# matndan AJRATGAN signallarga bog'lanadi, ya'ni faqat shu g'oyada haqiqatan
+# bor narsa so'raladi.
+#
+# Har bir savol arxitekturani o'zgartiradigan QARORni so'raydi (pul qayerda
+# turadi, ma'lumot qanday ajratiladi), didni emas.
+#
+# Tartib muhim: ro'yxat yuqoridan pastga o'qiladi va chegaraga yetganda
+# to'xtaydi, shuning uchun eng ko'p narsani o'zgartiradigani yuqorida turadi.
+
+_SIGNAL_ORDER = (
+    "payments", "compliance", "multi_tenant", "realtime", "offline",
+    "geo", "heavy_compute", "media_heavy", "ai", "search_heavy", "seo",
+)
+
+_SIGNAL_QUESTIONS: dict[str, dict[str, tuple[str, str]]] = {
+    "payments": {
+        "uz": ("Pul qayerda turadi va qaytarish (refund) qanday ishlaydi?",
+               "To'g'ridan-to'g'ri sotuvchiga / platformada ushlanadi / eskrou"),
+        "ru": ("Где хранятся деньги и как работает возврат?",
+               "Напрямую продавцу / удерживаются платформой / эскроу"),
+        "en": ("Where is the money held, and how do refunds work?",
+               "Straight to the seller / held by the platform / escrow"),
+    },
+    "compliance": {
+        "uz": ("Qanday shaxsiy yoki maxfiy ma'lumot saqlanadi?",
+               "Pasport, tibbiy yozuv, karta ma'lumoti, joylashuv tarixi"),
+        "ru": ("Какие персональные или конфиденциальные данные хранятся?",
+               "Паспорт, медзапись, данные карты, история местоположений"),
+        "en": ("What personal or sensitive data will be stored?",
+               "ID documents, medical records, card data, location history"),
+    },
+    "multi_tenant": {
+        "uz": ("Har bir tashkilotning ma'lumoti butunlay ajratilishi kerakmi?",
+               "To'liq ajratilgan / umumiy baza, filtr bilan / aralash"),
+        "ru": ("Данные каждой организации должны быть полностью изолированы?",
+               "Полная изоляция / общая база с фильтром / смешанно"),
+        "en": ("Must each organization's data be fully isolated?",
+               "Fully isolated / shared database with filtering / mixed"),
+    },
+    "realtime": {
+        "uz": ("Jonli yangilanish qayerda shart va qancha kechikishga chidaydi?",
+               "Bir soniya ichida / bir necha soniya / sahifani yangilash yetarli"),
+        "ru": ("Где нужны живые обновления и какая задержка допустима?",
+               "До секунды / несколько секунд / достаточно обновить страницу"),
+        "en": ("Where are live updates required, and what delay is acceptable?",
+               "Under a second / a few seconds / refreshing the page is enough"),
+    },
+    "offline": {
+        "uz": ("Internet yo'q paytda nima ishlashi kerak?",
+               "Faqat ko'rish / yozuv ham — keyin sinxronlanadi"),
+        "ru": ("Что должно работать без интернета?",
+               "Только просмотр / запись тоже — потом синхронизация"),
+        "en": ("What must keep working without internet?",
+               "Read-only / writing too, synced later"),
+    },
+    "geo": {
+        "uz": ("Xarita nima uchun kerak — ko'rsatish, masofa hisoblash yoki kuzatuv?",
+               "Javob real vaqt talabini va xarajatni belgilaydi"),
+        "ru": ("Зачем нужна карта — показать, считать расстояние или отслеживать?",
+               "От ответа зависят требования к реальному времени и стоимость"),
+        "en": ("What is the map for — display, distance calculation, or live tracking?",
+               "This determines real-time requirements and cost"),
+    },
+    "heavy_compute": {
+        "uz": ("Og'ir hisob qancha vaqt oladi va foydalanuvchi kutib turadimi?",
+               "Bir necha soniya / daqiqalar — natija keyin yuboriladi"),
+        "ru": ("Сколько занимают тяжёлые вычисления и ждёт ли пользователь?",
+               "Несколько секунд / минуты — результат придёт позже"),
+        "en": ("How long does the heavy computation take, and does the user wait?",
+               "A few seconds / minutes — the result is delivered later"),
+    },
+    "media_heavy": {
+        "uz": ("Fayllarni kim yuklaydi va ular qanchalik katta?",
+               "Rasm / video / hujjat, taxminiy hajm va oylik soni"),
+        "ru": ("Кто загружает файлы и насколько они большие?",
+               "Фото / видео / документы, примерный размер и объём в месяц"),
+        "en": ("Who uploads files, and how large are they?",
+               "Images / video / documents, rough size and monthly volume"),
+    },
+    "ai": {
+        "uz": ("AI qaysi qadamda ishlaydi va noto'g'ri javob bersa nima bo'ladi?",
+               "Odam tekshiradi / avtomatik qabul qilinadi / qayta so'raladi"),
+        "ru": ("На каком шаге работает AI и что если ответ неверный?",
+               "Проверяет человек / принимается автоматически / повторный запрос"),
+        "en": ("At which step does the AI run, and what happens if it is wrong?",
+               "A human reviews it / accepted automatically / retried"),
+    },
+    "search_heavy": {
+        "uz": ("Qidiruv nima bo'yicha va taxminan nechta yozuv ustidan ishlaydi?",
+               "Nom / tavsif / filtrlar; mingtami yoki millionta"),
+        "ru": ("По чему идёт поиск и по скольким записям примерно?",
+               "Название / описание / фильтры; тысячи или миллионы"),
+        "en": ("What does search run over, and across roughly how many records?",
+               "Title / description / filters; thousands or millions"),
+    },
+    "seo": {
+        "uz": ("Qaysi sahifalar qidiruv tizimlarida chiqishi kerak?",
+               "Javob renderlash usulini belgilaydi (SSR yoki SPA)"),
+        "ru": ("Какие страницы должны находиться в поисковиках?",
+               "От этого зависит способ рендеринга (SSR или SPA)"),
+        "en": ("Which pages must be indexable by search engines?",
+               "This determines the rendering approach (SSR vs SPA)"),
+    },
+}
+
+
+def _signal_questions(description: str, lang: str) -> list[Question]:
+    """Matnda aniqlangan signallar bo'yicha savollar. Tartib `_SIGNAL_ORDER` da."""
+    signals = extract_signals(description)
+    out: list[Question] = []
+    for name in _SIGNAL_ORDER:
+        if not signals.get(name):
+            continue
+        rows = _SIGNAL_QUESTIONS.get(name)
+        if not rows:
+            continue
+        text, hint = rows.get(lang, rows["uz"])
+        out.append(Question(id=name, question=text, hint=hint))
+    return out
+
+
+def build_questions(description: str, lang: str, count: int) -> list[Question]:
+    """G'oyaga moslangan savollarni LLM'siz yig'adi.
+
+    Tuzilishi: ikkita tayanch savol (rollar va asosiy amal — ular har qanday
+    loyihada ma'lumot modelini belgilaydi), so'ng aniqlangan signallar bo'yicha
+    savollar, oxirida hajmni chegaralaydigan savol.
+
+    Oxirgisi ataylab oxirida va har doim beriladi: "birinchi versiyada nima
+    BO'LMASLIGI kerak" degan javob topshiriq hajmini eng ko'p qisqartiradi.
+    """
+    base = _FALLBACK.get(lang, _FALLBACK["uz"])
+    head = [Question(id=f"q{i + 1}", question=q, hint=h) for i, (q, h) in enumerate(base[:2])]
+    scope_q, scope_hint = base[-1]
+    tail = Question(id="scope", question=scope_q, hint=scope_hint)
+
+    middle = _signal_questions(description, lang)
+
+    # Signallar kam bo'lsa (yoki umuman topilmasa) qolgan joyni umumiy
+    # savollar to'ldiradi. Ular signalga bog'liq savollardan zaifroq, shuning
+    # uchun faqat ORTDA turadi — bo'sh joy qolmasa umuman ishlatilmaydi.
+    room = max(0, count - len(head) - 1)
+    if len(middle) < room:
+        middle += [
+            Question(id=f"q{i + 3}", question=q, hint=h)
+            for i, (q, h) in enumerate(base[2:-1])
+        ]
+
+    return [*head, *middle[:room], tail]
 
 
 # --------------------------------------------------------------------------- #
@@ -257,9 +416,25 @@ async def ask(
     lang: str = "uz",
     count: int = 5,
 ) -> ClarifyResult:
-    """G'oyaga moslangan savollarni qaytaradi; LLM ishlamasa — statik ro'yxat."""
+    """G'oyaga moslangan savollarni qaytaradi.
+
+    Standart holatda savollar ML signallaridan yig'iladi (`build_questions`) —
+    tashqi model chaqirilmaydi. `USE_LLM=true` bo'lsa LLM yozadi, ishlamasa
+    xuddi shu deterministik yo'lga qaytiladi.
+    """
     count = max(_MIN_QUESTIONS, min(count, _MAX_QUESTIONS))
     playbook = get_playbook(project_type)
+
+    if not get_settings().use_llm:
+        # Ogohlantirish yo'q: bu zaxira emas, asosiy yo'l.
+        return ClarifyResult(
+            project_type=project_type,
+            project_title=project_title,
+            questions=_with_platform_question(
+                build_questions(description, lang, count), project_type, description, lang
+            ),
+            generated_by_llm=False,
+        )
 
     messages = [
         {

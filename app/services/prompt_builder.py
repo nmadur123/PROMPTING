@@ -18,6 +18,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Optional
 
+from app.config import get_settings
 from app.ml.engine import RetrievedChunk, engine
 from app.services import llm, openrouter, project_playbooks
 
@@ -1232,7 +1233,15 @@ _TRUNCATED_NOTE = {
 
 
 async def generate(ctx: BuildContext) -> GeneratedPrompt:
-    """Yakuniy promptni qaytaradi. OpenRouter ishlamasa — skeletni qaytaradi."""
+    """Yakuniy promptni qaytaradi.
+
+    Standart holatda topshiriq to'liq shu yerda yig'iladi: ML yadro turni
+    tasniflaydi va signallarni ajratadi, qoidalar stack/server/UI-UX/domenni
+    tanlaydi, playbook turga xos obyekt va oqimlarni beradi, retriever esa
+    korpusdan tegishli manbalarni topadi. Tashqi model chaqirilmaydi.
+
+    `USE_LLM=true` bo'lsa, yig'ilgan matn ustidan LLM qayta yozib chiqadi.
+    """
     hits = retrieve_guidance(ctx)
     guidance = format_guidance(hits)
     skeleton = build_skeleton(ctx)
@@ -1245,6 +1254,15 @@ async def generate(ctx: BuildContext) -> GeneratedPrompt:
         }
         for h in hits
     ]
+
+    if not get_settings().use_llm:
+        # Ogohlantirish YO'Q: bu zaxira yo'l emas, asosiy yo'l. Ilgari shu
+        # holatda "AI ishlamayapti" deyilardi va foydalanuvchi to'liq
+        # natijani nosozlik deb qabul qilardi.
+        return GeneratedPrompt(
+            prompt=skeleton, skeleton=skeleton, used_llm=False,
+            target_model=ctx.target_model, sources=sources,
+        )
 
     try:
         messages = build_meta_prompt(ctx, guidance, skeleton)

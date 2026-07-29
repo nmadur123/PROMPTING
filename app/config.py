@@ -36,6 +36,18 @@ class Settings(BaseSettings):
     #
     # Og'ir zanjirda Claude birinchi turadi — TT sifati mahsulotning o'zi.
     # Savollar uchun esa Gemini/OpenRouter yetarli va bir necha barobar arzon.
+    # Asosiy tugma: mahsulot LLM'siz ishlaydi.
+    #
+    # Texnik topshiriq ML yadro va qoidalar asosida yig'iladi — turni tasniflash,
+    # signallarni ajratish, stack/server tavsiyasi, playbook, UI-UX va domen —
+    # bularning hammasi allaqachon shu yerda, tashqi modelsiz. LLM faqat tayyor
+    # matnni qayta yozib chiqardi.
+    #
+    # `False` (standart) — hech qanday tashqi model chaqirilmaydi: bepul,
+    # bir zumda, tarmoqqa bog'liq emas va natija har safar bir xil.
+    # `True` — LLM matnni qayta yozadi (zanjir quyida).
+    use_llm: bool = False
+
     llm_providers: str = "tokenmix,openrouter,google"
     llm_providers_heavy: str = "tokenmix,openrouter,google"
 
