@@ -254,7 +254,7 @@ async def test_tokenmix_uses_same_model_for_both_chains():
 
 
 def test_default_chains_have_no_anthropic():
-    """Claude TokenMix orqali olinadi — to'g'ridan-to'g'ri zanjirda emas.
+    """Anthropic to'g'ridan-to'g'ri zanjirda emas — kalit yo'q.
 
     Sozlama `.env` dan ustidan yozilishi mumkin, shuning uchun kodning
     O'ZIDAGI standart qiymat tekshiriladi.
@@ -264,4 +264,4 @@ def test_default_chains_have_no_anthropic():
     defaults = Settings.model_fields
     assert "anthropic" not in defaults["llm_providers_heavy"].default
     assert "anthropic" not in defaults["llm_providers"].default
-    assert "tokenmix" in defaults["llm_providers_heavy"].default
+    assert defaults["llm_providers_heavy"].default.startswith("moonshot")

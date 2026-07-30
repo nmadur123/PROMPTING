@@ -48,8 +48,8 @@ class Settings(BaseSettings):
     # `True` — LLM matnni qayta yozadi (zanjir quyida).
     use_llm: bool = False
 
-    llm_providers: str = "moonshot,tokenmix,openrouter,google"
-    llm_providers_heavy: str = "moonshot,tokenmix,openrouter,google"
+    llm_providers: str = "moonshot,openrouter,google"
+    llm_providers_heavy: str = "moonshot,openrouter,google"
 
     google_api_key: str = ""
     google_model: str = "gemini-2.5-flash"
@@ -74,9 +74,13 @@ class Settings(BaseSettings):
     linkup_depth: str = "standard"           # standard | deep
     linkup_output_type: str = "sourcedAnswer"
 
-    # TokenMix — bitta kalit ostida ko'p provayder (OpenAI-mos API).
-    # Og'ir va yengil ish uchun ikki xil model qo'yish mumkin; hozir
-    # ikkalasi ham `kimi-k3`, chunki kalitda ruxsat berilgan yagona model shu.
+    # TokenMix — standart zanjirdan OLIB TASHLANGAN.
+    #
+    # Sabab: kalitda ruxsat berilgan yagona model `kimi-k3` va u promo
+    # kreditda ishlamaydi. Ikki dona ishlamaydigan provayderni zanjirda
+    # ushlab turish faqat kechikish qo'shadi — har so'rov navbat bilan
+    # yiqiladi. Kod joyida: balans to'lsa zanjirga `tokenmix` yozilsa
+    # yana ishlaydi.
     tokenmix_api_key: str = ""
     tokenmix_base_url: str = "https://api.tokenmix.ai/v1"
     tokenmix_model: str = "kimi-k3"
