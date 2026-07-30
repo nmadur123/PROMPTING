@@ -17,6 +17,9 @@ class CompetitorRequest(BaseModel):
     description: str = Field(min_length=20, max_length=6000)
     lang: str = Field(default="uz", pattern="^(uz|ru|en)$")
     top_k: int = Field(default=5, ge=1, le=10)
+    # Jonli tadqiqot so'rov krediti sarflaydi — ataylab so'raladi.
+    include_web: bool = False
+    region: str = Field(default="uz", pattern="^(uz|eu|us|global)$")
 
 
 @router.post("/competitors", summary="O'xshash startuplar va ustunlik yo'llari")
@@ -43,6 +46,8 @@ async def analyze_competitors(
         project_type=prediction.label,
         signals=extract_signals(body.description),
         top_k=body.top_k,
+        include_web=body.include_web,
+        region=body.region,
     )
     return {
         "project_type": prediction.label,

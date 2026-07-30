@@ -26,3 +26,6 @@ data/artifacts/*.joblib
 data/pdf/*.pdf
 
 .DS_Store
+
+# Jonli tadqiqot keshi — mahalliy, repoga kirmaydi
+data/research_cache/

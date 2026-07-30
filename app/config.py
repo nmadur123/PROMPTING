@@ -59,6 +59,21 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-opus-5"
 
+    # --- Jonli web-tadqiqot (Linkup) ---
+    # Lokal portfel dataseti faqat ikkita akselerator ro'yxatidan yig'ilgan,
+    # ya'ni bozorning kichik qismi. Linkup internetdan qidiradi va portfelda
+    # yo'q raqobatchilarni topadi (sinovda NoAsk, Stolik).
+    #
+    # `linkup_output_type`:
+    #   searchResults — xom natijalar, hech qanday model ishlatilmaydi;
+    #   sourcedAnswer — Linkup tomonida model javobni yig'ib beradi.
+    # Standart `sourcedAnswer`: bir necha manbani bir joyga yig'adi va
+    # foydaliroq. Model umuman kerak bo'lmasa `searchResults` qo'yiladi.
+    linkup_api_key: str = ""
+    linkup_enabled: bool = True
+    linkup_depth: str = "standard"           # standard | deep
+    linkup_output_type: str = "sourcedAnswer"
+
     # TokenMix — bitta kalit ostida ko'p provayder (OpenAI-mos API).
     # Og'ir va yengil ish uchun ikki xil model qo'yish mumkin; hozir
     # ikkalasi ham `kimi-k3`, chunki kalitda ruxsat berilgan yagona model shu.

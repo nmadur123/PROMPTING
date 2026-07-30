@@ -199,6 +199,8 @@ class CompetitorAnalysis:
     advantages: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     dataset_size: int = 0
+    # Jonli web-tadqiqot natijasi (Linkup). Xizmat o'chirilgan bo'lsa `None`.
+    web: Optional[dict] = None
 
     def to_dict(self) -> dict:
         return {
@@ -219,12 +221,31 @@ class CompetitorAnalysis:
             ],
             "advantages": self.advantages,
             "warnings": self.warnings,
+            "web": self.web,
         }
 
 
 # --------------------------------------------------------------------------- #
 # Indeks
 # --------------------------------------------------------------------------- #
+
+
+def _web_research(description: str, project_type: str, region: str) -> Optional[dict]:
+    """Jonli tadqiqot. Har qanday nosozlik generatsiyani to'xtatmasin.
+
+    Import shu yerda: `web_research` ni yuqorida import qilsak, Linkup
+    o'chirilgan o'rnatishlarda ham modul yuklanardi — kerak emas.
+    """
+    from app.services import web_research
+
+    if not web_research.enabled():
+        return None
+    try:
+        result = web_research.research_competitors(description, project_type, region)
+    except Exception:  # noqa: BLE001
+        logger.exception("Jonli tadqiqot yiqildi — o'tkazib yuborildi")
+        return None
+    return result.to_dict() if result.ok else None
 
 
 def _level(ratio: float) -> str:
@@ -477,11 +498,20 @@ def analyze(
     project_type: str = "",
     signals: Optional[dict[str, bool]] = None,
     top_k: int = 5,
+    include_web: bool = False,
+    region: str = "uz",
 ) -> CompetitorAnalysis:
-    """G'oyaga o'xshash startuplarni topadi va ustunlik yo'llarini qaytaradi."""
+    """G'oyaga o'xshash startuplarni topadi va ustunlik yo'llarini qaytaradi.
+
+    `include_web=True` bo'lsa Linkup orqali jonli tadqiqot ham qo'shiladi.
+    Standart `False`: u so'rov krediti sarflaydi, shuning uchun chaqiruvchi
+    ataylab so'rashi kerak.
+    """
+    web = _web_research(description, project_type, region) if include_web else None
+
     index = get_index()
     if index is None:
-        return CompetitorAnalysis()
+        return CompetitorAnalysis(web=web)
 
     matches = index.search(description, top_k=top_k)
 
@@ -490,4 +520,5 @@ def analyze(
         advantages=_advantages(project_type, signals or {}, matches),
         warnings=_warnings(matches),
         dataset_size=len(index.items),
+        web=web,
     )
