@@ -26,14 +26,18 @@ def calls(monkeypatch):
     seen: list[str] = []
 
     settings = llm.get_settings()
-    monkeypatch.setattr(settings, "llm_providers", "tokenmix,openrouter,google", raising=False)
+    monkeypatch.setattr(settings, "llm_providers", "moonshot,tokenmix,openrouter,google", raising=False)
     monkeypatch.setattr(
-        settings, "llm_providers_heavy", "tokenmix,anthropic,openrouter,google", raising=False
+        settings, "llm_providers_heavy", "moonshot,tokenmix,anthropic,openrouter,google", raising=False
     )
     # DIQQAT: bu yerdagi zanjir standart sozlama EMAS — `anthropic` ataylab
     # qo'shilgan, chunki testlar zanjir *tartibini* tekshiradi va buning
     # uchun uch xil provayder kerak. Ishlab turgan standart zanjirni
     # `test_default_chains_have_no_anthropic` qulflaydi.
+
+    async def moonshot(messages, max_tokens, temperature, heavy):
+        seen.append(f"moonshot:{'heavy' if heavy else 'light'}")
+        raise llm.LLMError("qo'g'irchoq: moonshot o'tkazib yuborildi")
 
     async def tokenmix(messages, max_tokens, temperature, heavy):
         seen.append(f"tokenmix:{'heavy' if heavy else 'light'}")
@@ -51,6 +55,7 @@ def calls(monkeypatch):
         seen.append("google")
         return "javob"
 
+    monkeypatch.setattr(llm, "_complete_moonshot", moonshot)
     monkeypatch.setattr(llm, "_complete_tokenmix", tokenmix)
     monkeypatch.setattr(llm, "_complete_anthropic", anthropic)
     monkeypatch.setattr(llm, "_complete_openrouter", openrouter)
@@ -61,7 +66,7 @@ def calls(monkeypatch):
 async def test_heavy_chain_order(calls):
     text, provider = await llm.complete(_MSG, heavy=True)
     # Hammasi yiqilgach Google javob berdi — zanjir oxirigacha bordi.
-    assert calls == ["tokenmix:heavy", "anthropic", "openrouter", "google"]
+    assert calls == ["moonshot:heavy", "tokenmix:heavy", "anthropic", "openrouter", "google"]
     assert (text, provider) == ("javob", "google")
 
 
@@ -69,7 +74,7 @@ async def test_light_chain_skips_anthropic(calls):
     """Qisqa so'rovlar qimmat modelga bormasligi kerak."""
     await llm.complete(_MSG)
     assert "anthropic" not in calls
-    assert calls == ["tokenmix:light", "openrouter", "google"]
+    assert calls == ["moonshot:light", "tokenmix:light", "openrouter", "google"]
 
 
 async def test_tokenmix_gets_heavy_flag_through(calls):
@@ -78,10 +83,10 @@ async def test_tokenmix_gets_heavy_flag_through(calls):
     Bayroq yo'qolsa to'liq texnik topshiriq jimgina arzon modelga yozilardi.
     """
     await llm.complete(_MSG, heavy=True)
-    assert calls[0] == "tokenmix:heavy"
+    assert "tokenmix:heavy" in calls
     calls.clear()
     await llm.complete(_MSG, heavy=False)
-    assert calls[0] == "tokenmix:light"
+    assert "tokenmix:light" in calls
 
 
 async def test_all_providers_failing_raises(calls, monkeypatch):
@@ -95,7 +100,7 @@ async def test_all_providers_failing_raises(calls, monkeypatch):
         await llm.complete(_MSG, heavy=True)
     # Xabarda har bir provayderning sababi qolsin — aks holda nosozlikni
     # topish uchun jurnalga qarashdan boshqa yo'l bo'lmaydi.
-    for provider in ("tokenmix", "anthropic", "openrouter", "google"):
+    for provider in ("moonshot", "tokenmix", "anthropic", "openrouter", "google"):
         assert provider in str(exc.value)
 
 
@@ -259,4 +264,4 @@ def test_default_chains_have_no_anthropic():
     defaults = Settings.model_fields
     assert "anthropic" not in defaults["llm_providers_heavy"].default
     assert "anthropic" not in defaults["llm_providers"].default
-    assert defaults["llm_providers_heavy"].default.startswith("tokenmix")
+    assert "tokenmix" in defaults["llm_providers_heavy"].default

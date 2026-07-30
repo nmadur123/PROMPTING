@@ -126,29 +126,32 @@ async def _complete_google(
 
 
 # --------------------------------------------------------------------------- #
-# TokenMix — bitta kalit ostida ko'p provayder (OpenAI-mos)
+# OpenAI-mos provayderlar (TokenMix, Moonshot/Kimi)
 # --------------------------------------------------------------------------- #
+#
+# Ikkisi ham bir xil `/chat/completions` shaklini gapiradi, shuning uchun
+# bitta funksiya ikkalasiga xizmat qiladi. Ilgari bu kod faqat TokenMix uchun
+# yozilgan edi; Moonshot qo'shilganda o'sha ellik qator ikkinchi marta
+# ko'chirilishi kerak bo'lardi — xato tuzatilsa bittasida tuzatilib,
+# ikkinchisida qolib ketadigan joy.
 
 
-async def _complete_tokenmix(
+async def _complete_openai_compatible(
+    *,
+    label: str,
+    key: str,
+    key_env: str,
+    base_url: str,
+    model: str,
     messages: list[dict],
     max_tokens: int,
     temperature: float,
-    heavy: bool,
 ) -> str:
-    """OpenAI-mos `/chat/completions`. Xabar formati tarjimasiz ketadi.
-
-    Og'ir va yengil ish uchun ikki xil model: birinchisi mahsulotning o'zini
-    yozadi, ikkinchisi qisqa yordamchi so'rovlarga javob beradi. Bitta hisob
-    ostida ikkalasi ham bo'lgani uchun zanjirning boshida turadi.
-    """
-    settings = get_settings()
-    key = settings.tokenmix_api_key
+    """OpenAI-mos `/chat/completions`. Xabar formati tarjimasiz ketadi."""
     if not key:
-        raise LLMError("TOKENMIX_API_KEY sozlanmagan")
+        raise LLMError(f"{key_env} sozlanmagan")
 
-    model = settings.tokenmix_model if heavy else settings.tokenmix_model_light
-    url = f"{settings.tokenmix_base_url.rstrip('/')}/chat/completions"
+    url = f"{base_url.rstrip('/')}/chat/completions"
 
     try:
         async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
@@ -163,35 +166,62 @@ async def _complete_tokenmix(
                 },
             )
     except httpx.HTTPError as exc:
-        raise LLMError(f"TokenMix'ga ulanib bo'lmadi: {exc}") from exc
+        raise LLMError(f"{label}'ga ulanib bo'lmadi: {exc}") from exc
 
     if resp.status_code != 200:
-        # Ikkita sozlama muammosi eng ko'p uchraydi va ikkalasi ham oddiy
-        # HTTP xatosiga o'xshab keladi. Ajratib aytmasak, jurnalda "400 Bad
-        # Request" turadi-yu, nima qilish kerakligi ko'rinmaydi.
-        body = resp.text[:300]
+        # Sozlama va to'lov muammolari oddiy HTTP xatosiga o'xshab keladi.
+        # Ajratib aytmasak, jurnalda "400 Bad Request" turadi-yu, nima qilish
+        # kerakligi ko'rinmaydi.
+        body = resp.text[:400]
         if "not allowed to access" in body:
             raise LLMError(
-                f"TokenMix: kalitga `{model}` modeliga ruxsat berilmagan "
+                f"{label}: kalitga `{model}` modeliga ruxsat berilmagan "
                 "(dashboard -> API key -> Models)"
             )
+        if "insufficient balance" in body or "is suspended" in body:
+            raise LLMError(f"{label}: hisobda balans yo'q — hisobni to'ldirish kerak")
         if "promotional credits" in body or "insufficient_quota" in body:
             raise LLMError(
-                f"TokenMix: `{model}` promo kreditda ishlamaydi, pullik balans kerak "
-                "(tokenmix.ai/dashboard/credits)"
+                f"{label}: `{model}` promo kreditda ishlamaydi, pullik balans kerak"
             )
-        raise LLMError(f"TokenMix xatosi {resp.status_code}: {body}")
+        raise LLMError(f"{label} xatosi {resp.status_code}: {body}")
 
     data = resp.json()
     choices = data.get("choices") or []
     if not choices:
-        raise LLMError(f"TokenMix bo'sh javob qaytardi: {str(data)[:200]}")
+        raise LLMError(f"{label} bo'sh javob qaytardi: {str(data)[:200]}")
 
     text = ((choices[0].get("message") or {}).get("content") or "").strip()
     if not text:
         finish = choices[0].get("finish_reason")
-        raise LLMError(f"TokenMix bo'sh matn qaytardi (finish_reason: {finish})")
+        raise LLMError(f"{label} bo'sh matn qaytardi (finish_reason: {finish})")
     return text
+
+
+async def _complete_tokenmix(messages, max_tokens: int, temperature: float, heavy: bool) -> str:
+    """Bitta kalit ostida ko'p model. Og'ir va yengil ish uchun ikki xil model."""
+    s = get_settings()
+    return await _complete_openai_compatible(
+        label="TokenMix", key=s.tokenmix_api_key, key_env="TOKENMIX_API_KEY",
+        base_url=s.tokenmix_base_url,
+        model=(s.tokenmix_model if heavy else s.tokenmix_model_light),
+        messages=messages, max_tokens=max_tokens, temperature=temperature,
+    )
+
+
+async def _complete_moonshot(messages, max_tokens: int, temperature: float, heavy: bool) -> str:
+    """Moonshot (Kimi) to'g'ridan-to'g'ri.
+
+    DIQQAT: xalqaro kalit `api.moonshot.ai` da ishlaydi, `.cn` esa 401
+    qaytaradi — bu ikki alohida hisob tizimi va kalitlar o'zaro yaramaydi.
+    """
+    s = get_settings()
+    return await _complete_openai_compatible(
+        label="Moonshot", key=s.moonshot_api_key, key_env="MOONSHOT_API_KEY",
+        base_url=s.moonshot_base_url,
+        model=(s.moonshot_model if heavy else s.moonshot_model_light),
+        messages=messages, max_tokens=max_tokens, temperature=temperature,
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -330,6 +360,8 @@ async def complete(
         try:
             if provider == "tokenmix":
                 return await _complete_tokenmix(messages, max_tokens, temperature, heavy), provider
+            if provider in ("moonshot", "kimi"):
+                return await _complete_moonshot(messages, max_tokens, temperature, heavy), "moonshot"
             if provider in ("anthropic", "claude"):
                 return await _complete_anthropic(messages, max_tokens), "anthropic"
             if provider == "openrouter":

@@ -48,8 +48,8 @@ class Settings(BaseSettings):
     # `True` — LLM matnni qayta yozadi (zanjir quyida).
     use_llm: bool = False
 
-    llm_providers: str = "tokenmix,openrouter,google"
-    llm_providers_heavy: str = "tokenmix,openrouter,google"
+    llm_providers: str = "moonshot,tokenmix,openrouter,google"
+    llm_providers_heavy: str = "moonshot,tokenmix,openrouter,google"
 
     google_api_key: str = ""
     google_model: str = "gemini-2.5-flash"
@@ -81,6 +81,14 @@ class Settings(BaseSettings):
     tokenmix_base_url: str = "https://api.tokenmix.ai/v1"
     tokenmix_model: str = "kimi-k3"
     tokenmix_model_light: str = "kimi-k3"
+
+    # Moonshot (Kimi) to'g'ridan-to'g'ri.
+    # DIQQAT: xalqaro kalit `api.moonshot.ai` da ishlaydi; `.cn` boshqa hisob
+    # tizimi va o'sha kalit bilan 401 qaytaradi.
+    moonshot_api_key: str = ""
+    moonshot_base_url: str = "https://api.moonshot.ai/v1"
+    moonshot_model: str = "kimi-k2.6"
+    moonshot_model_light: str = "kimi-k2.6"
 
     database_url: str = "sqlite+aiosqlite:///./prompting.db"
     cors_origins: str = "https://sys42.xyz,https://www.sys42.xyz,https://pr-nu-three.vercel.app"
