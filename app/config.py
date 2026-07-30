@@ -1,8 +1,10 @@
 """Ilova sozlamalari — hammasi .env dan o'qiladi."""
 
+import os
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,6 +36,38 @@ PRODUCTION_ORIGINS: tuple[str, ...] = (
 # Naqsh ataylab tor: butun `*.vercel.app` ga ochib qo'yish begona saytlarga
 # ham API ni ochib berardi (allow_credentials=True bilan bu ayniqsa xavfli).
 PRODUCTION_ORIGIN_REGEX = r"https://(?:pr|sys42)(?:-[a-z0-9-]+)?\.vercel\.app"
+
+# Ulangan disk yo'li. Railway buni o'zi qo'yadi, boshqa hostingda qo'lda.
+VOLUME_ENV_VARS = ("RAILWAY_VOLUME_MOUNT_PATH", "DATA_VOLUME_PATH")
+
+
+def volume_path() -> str | None:
+    """Ulangan disk bo'lsa uning yo'li, bo'lmasa None."""
+    for var in VOLUME_ENV_VARS:
+        value = (os.getenv(var) or "").strip()
+        if value:
+            return value
+    return None
+
+
+def _default_database_url() -> str:
+    """SQLite faylini deploylardan omon qoladigan joyga qo'yadi.
+
+    Konteyner fayl tizimi HAR DEPLOYDA toza holatdan boshlanadi. Standart
+    `./prompting.db` konteyner ichida yotadi, ya'ni har deployda barcha
+    foydalanuvchi, kvota va to'lov yozuvi yo'qoladi. Tashqi belgisi shuki,
+    kirgan odam keyingi deploydan keyin 401 ola boshlaydi: tokeni butun va
+    imzosi to'g'ri, lekin u ko'rsatayotgan hisob bazada yo'q.
+
+    Disk ulangan bo'lsa baza o'sha yerda yotadi va deploydan omon qoladi.
+    Postgres ishlatilsa DATABASE_URL baribir shuni ustidan yozadi.
+    """
+    mount = volume_path()
+    if mount:
+        # Bu URL, OS yo'li emas — `Path` Windows'da teskari chiziq qo'yardi va
+        # hosil bo'lgan URL noto'g'ri bo'lardi. Shuning uchun oldinga chiziq.
+        return f"sqlite+aiosqlite:///{mount.rstrip('/')}/prompting.db"
+    return "sqlite+aiosqlite:///./prompting.db"
 
 
 class Settings(BaseSettings):
@@ -118,7 +152,7 @@ class Settings(BaseSettings):
     moonshot_model: str = "kimi-k2.6"
     moonshot_model_light: str = "kimi-k2.6"
 
-    database_url: str = "sqlite+aiosqlite:///./prompting.db"
+    database_url: str = Field(default_factory=_default_database_url)
 
     # Qo'shimcha domenlar (lokal portlar, boshqa front). Doimiy production
     # domenlari `PRODUCTION_ORIGINS` da — bu yerda takrorlash shart emas.

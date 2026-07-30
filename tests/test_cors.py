@@ -11,7 +11,9 @@ production domenlari o'tishi shart.
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy.engine import make_url
 
+from app import config
 from app.config import Settings
 from app.main import app
 
@@ -90,3 +92,29 @@ def test_qoshimcha_naqsh_doimiysiga_qoshiladi():
     assert rx.fullmatch("https://sys42.vercel.app")
     assert rx.fullmatch("https://staging-abc.example.com")
     assert not rx.fullmatch("https://evil.com")
+
+
+# --------------------------------------------------------------------------- #
+# Baza yo'li — 401 ning ildizi shu yerda edi
+# --------------------------------------------------------------------------- #
+
+
+def test_disk_ulanmagan_bolsa_joriy_papka(monkeypatch):
+    for var in config.VOLUME_ENV_VARS:
+        monkeypatch.delenv(var, raising=False)
+
+    assert config._default_database_url() == "sqlite+aiosqlite:///./prompting.db"
+
+
+@pytest.mark.parametrize("mount", ["/data", "/data/"])
+def test_disk_ulangan_bolsa_baza_oshanda(monkeypatch, mount):
+    """Deploydan omon qolishi uchun SQLite ulangan diskda yotishi kerak."""
+    monkeypatch.delenv("DATA_VOLUME_PATH", raising=False)
+    monkeypatch.setenv("RAILWAY_VOLUME_MOUNT_PATH", mount)
+
+    url = config._default_database_url()
+
+    assert url == "sqlite+aiosqlite:////data/prompting.db"
+    # URL, OS yo'li emas — Windows'da ham oldinga chiziq bo'lishi shart.
+    assert "\\" not in url
+    assert make_url(url).database == "/data/prompting.db"

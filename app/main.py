@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import get_settings
+from app.config import get_settings, volume_path
 from app.database import init_db
 from app.ml.engine import engine
 from app.routers import (
@@ -58,9 +59,39 @@ def _check_production_config() -> None:
         )
 
 
+def _warn_if_database_is_ephemeral() -> None:
+    """Baza deploydan omon qolmasa — buni baland ovozda aytadi.
+
+    Ishga tushishni TO'XTATMAYDI: xizmat ishlashi kerak, aks holda bitta
+    sozlama tufayli butun mahsulot yiqilardi. Lekin jimgina o'tkazib ham
+    yuborilmaydi — belgisi juda chalg'ituvchi: hamma "sababsiz" tizimdan
+    chiqib qoladi va `/api/generate` 401 qaytaradi, garchi token butun,
+    imzosi to'g'ri va muddati tugamagan bo'lsa ham. Sabab oddiy: hisob
+    yozuvi bazada endi yo'q.
+    """
+    if not settings.database_url.startswith("sqlite"):
+        return  # Postgres/MySQL — konteynerdan tashqarida, muammo yo'q
+    if volume_path():
+        return  # disk ulangan, fayl saqlanib qoladi
+
+    # Railway va Render konteyner ichida shu o'zgaruvchilarni qo'yadi.
+    on_host = any(os.getenv(v) for v in ("RAILWAY_ENVIRONMENT", "RAILWAY_PROJECT_ID", "RENDER"))
+    if not on_host:
+        return  # lokal ishlab chiqish — `./prompting.db` joyida qoladi
+
+    logger.warning(
+        "BAZA VAQTINCHALIK: SQLite konteyner ichida (%s), disk ulanmagan. "
+        "Har deployda barcha foydalanuvchi, kvota va to'lov o'chadi — kirgan "
+        "odamlar 401 ola boshlaydi. Yechim: hosting panelida disk (volume) "
+        "ulang yoki Postgres qo'shib DATABASE_URL ni ko'rsating.",
+        settings.database_url,
+    )
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     _check_production_config()
+    _warn_if_database_is_ephemeral()
     # CORS xatosi brauzerda "No Access-Control-Allow-Origin" deb ko'rinadi va
     # server tomonda hech qanday iz qoldirmaydi. Ro'yxatni startda yozib
     # qo'yamiz — keyingi safar log'dan darrov ko'rinadi.
