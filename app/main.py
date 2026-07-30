@@ -67,7 +67,7 @@ async def lifespan(app: FastAPI):
     logger.info(
         "CORS ruxsati: %s | regex: %s",
         settings.cors_list,
-        settings.cors_origin_regex or "(yo'q)",
+        settings.cors_regex,
     )
     await init_db()
     # ML modelini oldindan yuklaymiz — birinchi foydalanuvchi kutmasin.
@@ -93,8 +93,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_list,
     # Ro'yxatga tushmagan, lekin naqshga mos domenlar (Vercel preview
-    # deploylari) ham o'tsin — batafsil izoh `config.cors_origin_regex` da.
-    allow_origin_regex=settings.cors_origin_regex or None,
+    # deploylari) ham o'tsin — batafsil izoh `config.PRODUCTION_ORIGIN_REGEX` da.
+    allow_origin_regex=settings.cors_regex,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
