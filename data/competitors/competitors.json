@@ -1,0 +1,625 @@
+{
+ "count": 62,
+ "items": [
+  {
+   "name": "DataFlow",
+   "slug": "dataflow",
+   "description": "Turn your data into decisions - without a data team. AI analyzes your data, spots problems, and recommends what to do next - no analyst required. Connect your database and get dashboards, insights, and alerts automatically. Replaces expensive BI tools like Power BI for mid-market companies.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/dataflow",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "TheCarGo",
+   "slug": "thecargo",
+   "description": "AI Broker Agent for Car Shipping. Car shipping brokers lose 3+ hours a day on manual work. TheCarGo provides instant pricing, smart follow-up sequences with 40%+ open rate, and an AI broker agent that books customers while you sleep.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/thecargo",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "ttlk",
+   "slug": "ttlk",
+   "description": "Your Total Look - Virtual Try-On. Over 90% of returns are caused by wrong size choice. ttlk provides realistic virtual try-on - upload just three photos and get accurate sizing.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/ttlk",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "SecurePrompt",
+   "slug": "secureprompt",
+   "description": "The Security Layer for Enterprise AI. 75% of enterprises cite data privacy as their #1 barrier to AI adoption. SecurePrompt provides real-time inspection, threat protection, and hybrid tokenization engine - the invisible shield for LLMs.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/secureprompt",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "ContentCoach",
+   "slug": "sayraai",
+   "description": "Your Personal AI Coach for Viral Content. Creators struggle with ideas, consistency, and growth. ContentCoach uses AI to generate viral content ideas, hooks, and strategies tailored to your niche - helping you grow your audience and create impactful content faster.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/sayraai",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "AviLingo",
+   "slug": "avilingo",
+   "description": "The Future of Aviation English Training. AI-powered ICAO certification prep for the world's pilots. 2,300+ deaths from communication failures in aviation history. AviLingo makes aviation English training accessible and personalized for 330K+ commercial pilots worldwide. $3B+ TAM.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/avilingo",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "FBA Flow",
+   "slug": "fbaflow",
+   "description": "AI Copilot for Amazon Sellers. AI Copilot for Amazon sellers that automates the marketing workflow, including video generation, image generation, and analytics.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/fbaflow",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Lumi",
+   "slug": "lumi",
+   "description": "Unlocking Every Child's Potential. In Uzbekistan, over 12 million children are under 16. Lumi provides personalized guidance, progress tracking, and a single platform to discover strengths, talents, and interests.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/lumi",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Maqsaddosh",
+   "slug": "maqsaddosh",
+   "description": "Social Network for Goal-Driven People. A platform that brings together people who share the same goals. It enables members to motivate and support each other while celebrating achievements and milestones together.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/maqsaddosh",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "SAIP",
+   "slug": "saip",
+   "description": "Bank Super-App - All services in one app. Bank mijozning raqamli hayotida 1% dan kam vaqt ishtirok etadi. SAIP bank ilovasini super-appga aylantiradi - barcha kundalik xizmatlar bitta joyda.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/saip",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Flow",
+   "slug": "flow",
+   "description": "AI-powered Chrome workspace that unifies tools, blocks distractions, and boosts focus. Flow is an AI-powered Chrome extension that turns your new tab into a productivity workspace, combining focus tools, distraction blocking, app integrations, and an AI assistant.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/flow",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Moomkin",
+   "slug": "moomkin",
+   "description": "Smart Marketing & Sales Platform. Businesses face low customer flow, expensive sales channels, and high marketing costs. Moomkin connects businesses to high-potential audiences through effective sales channels.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/moomkin",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "VENAZ.AI",
+   "slug": "anora",
+   "description": "Your Personal AI Creative Workflow Builder. Creators and teams waste time switching between multiple AI tools. Venaz AI is a unified creative platform that lets you generate, connect, and automate text, image, and video workflows in one place - turning ideas into scalable content systems in minutes.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/anora",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Bozorly.ai",
+   "slug": "bozorly",
+   "description": "Your Personal AI Meal Planner. Meal decisions happen every day without structure. Bozorly adds an intelligent planning layer - AI creates your weekly menu, prepares step-by-step recipes, and calculates how much your grocery shopping will cost.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/bozorly",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Business Robots AI",
+   "slug": "businessrobotsai",
+   "description": "AI Robots for Business Automation. Business Robots AI is a platform of intelligent AI agents designed to automate business processes. It handles repetitive tasks, streamlines workflows, and helps companies reduce operational costs.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/businessrobotsai",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Converza",
+   "slug": "converza",
+   "description": "AI Social Media Manager for Businesses. Managing marketing content is slow and expensive. Converza is an AI-powered SMM manager that plans strategy, creates viral video ads, and drives sales automatically - working 24/7 at a fraction of the cost of a human marketing team.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/converza",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "diip.uz",
+   "slug": "diipuz",
+   "description": "Freight & Transport Matching Platform. DIIP is a logistics platform that connects drivers, truck owners, and cargo owners in one system. It simplifies the freight process by helping businesses find available trucks or cargo quickly, reducing time, manual coordination, and transportation costs",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/diipuz",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "EazyEnglish",
+   "slug": "eazyenglish",
+   "description": "Easy Way to Learn English. EazyEnglish - ingliz tilini oson va samarali o'rganish platformasi. Interaktiv darslar, AI-powered practice va personalized learning path.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/eazyenglish",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Fonus Kids",
+   "slug": "fonuskids",
+   "description": "Safe Digital Platform for Kids. Children are exposed to harmful and inappropriate content on open platforms. Fonus Kids is a safe digital ecosystem that provides filtered, ad-free educational videos and cartoons, helping parents create a secure and healthy online environment for their children.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/fonuskids",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Genix",
+   "slug": "genix",
+   "description": "AI-Native ERP for Business Automation. Many companies still rely on Excel or multiple disconnected tools to run their operations. Genix ERP is an AI-powered platform that lets businesses deploy and customize a full ERP system in minutes using natural language - automating workflows, unifying departments, and eliminating complex setup.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/genix",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Horyco",
+   "slug": "horyco",
+   "description": "AI Operating System for Restaurants. Restaurants often rely on multiple tools, spreadsheets, and manual reports to manage operations. Horyco is an AI-driven operating system for HoReCa businesses that combines POS, inventory, analytics, and management tools into one intelligent platform to automate operations and improve profitability.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/horyco",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Mebelim",
+   "slug": "mebelim",
+   "description": "CRM Platform for Furniture Businesses. Furniture stores often lose customers, orders, and payments due to poor tracking. Mebelim CRM is a management platform designed for furniture businesses to track customers, orders, sales, and production in one system - helping stores increase sales and reduce delays.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/mebelim",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Ravon Cloud",
+   "slug": "ravoncloud",
+   "description": "Secure Code Execution Infrastructure for Developers. Running untrusted code safely is complex and expensive. Ravon provides a sandbox infrastructure using lightweight Firecracker MicroVMs that allow developers to execute code securely, quickly, and at lower cost than traditional solutions.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/ravoncloud",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "REZVO",
+   "slug": "rezvo",
+   "description": "Online Reservation & CRM Platform for Restaurants. Rezvo is a digital platform that lets users book restaurant tables instantly while helping venues manage reservations, customer data, and marketing. It automates guest management and helps restaurants attract more customers and increase revenue.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/rezvo",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Sovchi.app",
+   "slug": "sovchi",
+   "description": "AI Matchmaking Assistant. Finding a compatible life partner is difficult and time-consuming. Sovchi is an AI matchmaking platform that helps people find suitable partners by analyzing preferences, values, and compatibility - making the search for a serious relationship more efficient and structured.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/sovchi",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Taneesh",
+   "slug": "taneesh",
+   "description": "Events-Based Social Networking App. Taneesh is a social discovery platform where people meet through real events in their city. Instead of endless swiping, users explore concerts, exhibitions, lectures, and parties, see who is attending, and connect with people who share the same interests.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/taneesh",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Zehnly AI",
+   "slug": "zehnly",
+   "description": "AI-Powered Language Learning Through Games. Learning English often feels boring and repetitive. Zehnly AI turns language learning into interactive mini-games that adapt to the user’s level, helping learners improve vocabulary, spelling, and critical thinking while having fun.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/zehnly",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Between",
+   "slug": "between",
+   "description": "Influencer Marketing Platform for Brands. Between is a SaaS platform that connects businesses with influencers and content creators. It helps brands launch marketing campaigns, collaborate with creators, and manage influencer partnerships more efficiently in one system.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/between",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Oqim",
+   "slug": "oqim",
+   "description": "AI Copilot for Telegram. Telegram is where millions of people run their work, sales, and communication, but it only stores messages - it doesn’t understand them. OQIM is an AI-powered Telegram client that understands your chats, remembers context, and helps you manage conversations, tasks, and sales automatically.",
+   "source": "uzcombinator",
+   "url": "",
+   "profile_url": "https://uzcombinator.uz/portfolio/oqim",
+   "investment": "",
+   "season": "1"
+  },
+  {
+   "name": "Databazaar",
+   "slug": "databazaar",
+   "description": "Mijoz egizaklarini yaratuvchi va biznes, marketing va mahsulot qarorlari uchun tezkor, ma’lumotlarga asoslangan ma’lumotlarni taqdim etuvchi sun’iy intellekt platformasidir.",
+   "source": "thepitch",
+   "url": "https://databazaar.ai/",
+   "profile_url": "",
+   "investment": "$1.020.000",
+   "season": ""
+  },
+  {
+   "name": "Alipos",
+   "slug": "alipos",
+   "description": "Restoranlarda jarayonlarni avtomatlashtirish uchun keng qamrovli yechimlarni taqdim etuvchi innovatsion B2B platformasi.",
+   "source": "thepitch",
+   "url": "https://alipos.uz/ru",
+   "profile_url": "",
+   "investment": "$200.000",
+   "season": ""
+  },
+  {
+   "name": "1way",
+   "slug": "1way",
+   "description": "Toshkent shahrida bir manzil tomon ketayotgan haydovchi va yo'lovchini birlashtiruvchi raydshering platformasi.",
+   "source": "thepitch",
+   "url": "https://1way.uz/",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Hgt",
+   "slug": "hgt",
+   "description": "Uy xo‘jaliklari uchun kommunal to‘lovlarni soddalashtiradigan va raqamlashtiradigan PropTech platformasi.",
+   "source": "thepitch",
+   "url": "https://domo.uz/",
+   "profile_url": "",
+   "investment": "$1,070,000.00",
+   "season": ""
+  },
+  {
+   "name": "Asint",
+   "slug": "asint",
+   "description": "Asint bu aktivlarni aqlli baholash va boshqarish platformasi.",
+   "source": "thepitch",
+   "url": "https://asint.uz/",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Karmonai",
+   "slug": "karmonai",
+   "description": "Byudjet tuzish, xarajatlarni nazorat qilish va kreditlarni boshqarish uchun AI asosidagi tahlillar bilan jihozlangan universal platforma.",
+   "source": "thepitch",
+   "url": "https://karmon.ai/en",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Aiba",
+   "slug": "aiba",
+   "description": "AI Agentlar orqali ishlaydigan biznes yordamchingiz.",
+   "source": "thepitch",
+   "url": "https://aiba.uz/",
+   "profile_url": "",
+   "investment": "$200.000",
+   "season": ""
+  },
+  {
+   "name": "Logosmart",
+   "slug": "logosmart",
+   "description": "Sun’iy intellekt texnologiyasiga asoslangan innovatsion dastur bo‘lib, u bolalardagi nutq muammolarini bartaraf etishga yordam beradi.",
+   "source": "thepitch",
+   "url": "https://logosmart.uz/",
+   "profile_url": "",
+   "investment": "$500.000",
+   "season": ""
+  },
+  {
+   "name": "Metanchi",
+   "slug": "metanchi",
+   "description": "O‘zbekistondagi haydovchilar va yoqilg‘i quyish shoxobchalari egalari uchun raqamli platforma.",
+   "source": "thepitch",
+   "url": "https://www.metanchi.uz/ru",
+   "profile_url": "",
+   "investment": "$30.000",
+   "season": ""
+  },
+  {
+   "name": "Onvision",
+   "slug": "onvision",
+   "description": "Kuzatuv kameralarini o‘ylaydigan tizimga aylantirish, ya’ni inson nazoratisiz muhitni tahlil qilish, xatoliklarni aniqlash va avtomatik ogohlantirishlarni yetkazish platformasi.",
+   "source": "thepitch",
+   "url": "https://onvision.uz/",
+   "profile_url": "",
+   "investment": "$80.000 ",
+   "season": ""
+  },
+  {
+   "name": "Tarteeb",
+   "slug": "tarteeb",
+   "description": "An’anaviy ta’lim jarayoniga sun’iy intellektni muvaffaqiyatli joriy etgan loyiha. 5000+ talaba va 200+ o‘qituvchi bizga ishonadi. Biz o‘quvchilar uchun individual yondashuvni, o‘qituvchilar uchun esa samaradorlikni ta’minlaymiz.",
+   "source": "thepitch",
+   "url": "https://www.tarteeb.uz",
+   "profile_url": "",
+   "investment": "$100 000 ",
+   "season": ""
+  },
+  {
+   "name": "Redeem",
+   "slug": "redeem",
+   "description": "Yoqilg‘i quyish shahobchalari uchun korporativ avtomobillarni boshqarish va yoqilg‘i to‘lovlarining o‘z vaqtida amalga oshirilishini ta’minlovchi tizim.",
+   "source": "thepitch",
+   "url": "https://redeem.uz/",
+   "profile_url": "",
+   "investment": "$100 000 ",
+   "season": ""
+  },
+  {
+   "name": "Nadira",
+   "slug": "nadira",
+   "description": "Onlayn shoppingni mahsulotlarning video kontenti orqali amalga oshirish imkonini beruvchi arzon platforma.",
+   "source": "thepitch",
+   "url": "",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Robosell",
+   "slug": "robosell",
+   "description": "Barcha asosiy vositalarni bitta yechimda birlashtirgan tezkor onlayn biznesni boshlash platformasi.",
+   "source": "thepitch",
+   "url": "https://robosell.uz/",
+   "profile_url": "",
+   "investment": "$75.000 ",
+   "season": ""
+  },
+  {
+   "name": "Dringo",
+   "slug": "dringo",
+   "description": "Ichimliklarni qulay va aqlli tarzda olish uchun yaratilgan platforma.",
+   "source": "thepitch",
+   "url": "",
+   "profile_url": "",
+   "investment": "$50.000 ",
+   "season": ""
+  },
+  {
+   "name": "Berockerai",
+   "slug": "berockerai",
+   "description": "Avtotransport brokerlari uchun yaratilgan AI asosidagi CRM — samarali ishlash uchun barcha kerakli vositalar, integratsiyalar va resurslarni taqdim etadi.",
+   "source": "thepitch",
+   "url": "",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Cosmos Innovation Bodytester",
+   "slug": "cosmos-innovation-bodytester",
+   "description": "Body Tester — taxminan 1,5 daqiqa ichida inson salomatligining asosiy ko‘rsatkichlarini tahlil qiluvchi innovatsion qurilma.",
+   "source": "thepitch",
+   "url": "",
+   "profile_url": "",
+   "investment": "$100.000 ",
+   "season": ""
+  },
+  {
+   "name": "Bito Erp",
+   "slug": "bito-erp",
+   "description": "Bito ERP kichik, o‘rta va yirik korxonalar uchun moslashtirilgan avtomatlashtirish yechimlarini taqdim etadi.",
+   "source": "thepitch",
+   "url": "https://bito.uz/",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Aisha",
+   "slug": "aisha",
+   "description": "Bizneslar uchun sun’iy intellektga asoslangan telefon qo‘ng‘iroqlari infratuzilmasi.",
+   "source": "thepitch",
+   "url": "https://aisha.group/en",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Renta Uz",
+   "slug": "renta-uz",
+   "description": "Avtomobillarni onlayn ijaraga berish va olish imkonini beruvchi raqamli platforma.",
+   "source": "thepitch",
+   "url": "https://renta-cars.uz/uz",
+   "profile_url": "",
+   "investment": "$300.000 ",
+   "season": ""
+  },
+  {
+   "name": "Obkeber",
+   "slug": "obkeber",
+   "description": "Ofis va ishlab chiqarish uchun xaridlarni obuna asosida tizimlashtiradigan servis.",
+   "source": "thepitch",
+   "url": "https://obkeber.uz/",
+   "profile_url": "",
+   "investment": "$130.000",
+   "season": ""
+  },
+  {
+   "name": "Yoou Power",
+   "slug": "yoou-power",
+   "description": "Powerbanklarni soatlik ijaraga berish xizmati.",
+   "source": "thepitch",
+   "url": "https://yoou.uz/",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Business Robots Ai",
+   "slug": "business-robots-ai",
+   "description": "AI agentlari bilan savdoni avtomatlashtirish platformasi.",
+   "source": "thepitch",
+   "url": "https://businessrobots.ai/",
+   "profile_url": "",
+   "investment": "$100.000 TAKLIF OLGAN",
+   "season": ""
+  },
+  {
+   "name": "Yago",
+   "slug": "yago",
+   "description": "Foydalanuvchi istaklarini sun’iy intellekt orqali tahlil qilib, ularni mos xizmatlarga yo‘naltiruvchi platforma.",
+   "source": "thepitch",
+   "url": "https://natex.io/",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Smartcast",
+   "slug": "smartcast",
+   "description": "O‘zbekistonda monitorlarda media-kontentni boshqarishga ixtisoslashgan birinchi startap (Digital Signage).",
+   "source": "thepitch",
+   "url": "https://smartcast.uz/",
+   "profile_url": "",
+   "investment": "$275.000",
+   "season": ""
+  },
+  {
+   "name": "Repetino",
+   "slug": "repetino",
+   "description": "O‘quvchilarni repetitorlar bilan bog‘laydigan onlayn bozor.",
+   "source": "thepitch",
+   "url": "https://www.repetino.kz/",
+   "profile_url": "",
+   "investment": "$150.000",
+   "season": ""
+  },
+  {
+   "name": "Mazza",
+   "slug": "mazza",
+   "description": "O‘zbekistondagi restoran va kafelarda kun oxirida qolgan sifatli, lekin sotilmay qolgan ovqatlarni chegirma bilan taklif qiluvchi mobil ilova.",
+   "source": "thepitch",
+   "url": "",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Hisobchi",
+   "slug": "hisobchi",
+   "description": "Telegram’da ishlaydigan va multiplatformali sun’iy intellekt asosidagi moliyaviy yordamchi.",
+   "source": "thepitch",
+   "url": "https://hisobchiai.uz/",
+   "profile_url": "",
+   "investment": "TAKLIF OLGAN",
+   "season": ""
+  },
+  {
+   "name": "Hisobchi Ai",
+   "slug": "hisobchi-ai",
+   "description": "Telegram’da ishlaydigan va multiplatformali sun’iy intellekt asosidagi moliyaviy yordamchi.",
+   "source": "thepitch",
+   "url": "https://hisobchiai.uz/",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Yoryor",
+   "slug": "yoryor",
+   "description": "Markaziy Osiyodagi juftliklarga to‘y va boshqa tadbirlarni tashkil etishda yordam berish uchun mo‘ljallangan to‘ylarni rejalashtirish ekotizimi.",
+   "source": "thepitch",
+   "url": "https://yoryor.net/",
+   "profile_url": "",
+   "investment": "TAKLIF OLGAN",
+   "season": ""
+  },
+  {
+   "name": "Screenix",
+   "slug": "screenix",
+   "description": "Agentlik sun’iy intellekti bo‘lib, u ishga qabul qilish voronkasini to‘liq boshqaradi.",
+   "source": "thepitch",
+   "url": "https://screenixai.com/?lang=ru",
+   "profile_url": "",
+   "investment": "TAKLIF OLGAN",
+   "season": ""
+  },
+  {
+   "name": "Medmapp",
+   "slug": "medmapp",
+   "description": "Oʻzbekiston va Markaziy Osiyo davlatlari uchun xalqaro tibbiy turizm platformasi.",
+   "source": "thepitch",
+   "url": "https://www.medmapp.uz/uz",
+   "profile_url": "",
+   "investment": "TAKLIF OLMAGAN",
+   "season": ""
+  },
+  {
+   "name": "Joymee",
+   "slug": "joymee",
+   "description": "Xonadonlar, yer uchastkalari va mehmonxonalarni bir platformada jamlagan ko‘chmas mulk servisi.",
+   "source": "thepitch",
+   "url": "https://joymee.uz/",
+   "profile_url": "",
+   "investment": "$100.000 ",
+   "season": ""
+  }
+ ]
+}

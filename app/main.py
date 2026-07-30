@@ -11,7 +11,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.database import init_db
 from app.ml.engine import engine
-from app.routers import admin_billing, admin_stats, auth, blueprint, content, estimates, models, payments
+from app.routers import (
+    admin_billing, admin_stats, auth, blueprint, competitors, content,
+    estimates, models, payments,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -103,6 +106,7 @@ app.include_router(estimates.router)
 app.include_router(content.router)
 app.include_router(blueprint.router)
 app.include_router(models.router)
+app.include_router(competitors.router)
 app.include_router(admin_billing.router)
 app.include_router(payments.router)
 

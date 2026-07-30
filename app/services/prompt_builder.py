@@ -20,6 +20,7 @@ from typing import Optional
 
 from app.config import get_settings
 from app.ml.engine import RetrievedChunk, engine
+from app.services import competitors as competitor_service
 from app.services import llm, openrouter, project_playbooks
 
 logger = logging.getLogger(__name__)
@@ -1232,6 +1233,75 @@ _TRUNCATED_NOTE = {
 }
 
 
+_COMPETITOR_HEADING = {
+    "uz": "RAQOBAT MUHITI VA USTUNLIK",
+    "ru": "КОНКУРЕНТНАЯ СРЕДА И ПРЕИМУЩЕСТВО",
+    "en": "COMPETITIVE LANDSCAPE AND DIFFERENTIATION",
+}
+_COMPETITOR_INTRO = {
+    "uz": ("O'zbekiston startup bazasidan (thepitch.uz, uzcombinator.uz) tavsifi "
+           "eng yaqin loyihalar. Bu hukm emas — havolani ochib tekshirish kerak."),
+    "ru": ("Проекты с наиболее близким описанием из базы стартапов Узбекистана "
+           "(thepitch.uz, uzcombinator.uz). Это не вердикт — проверьте по ссылке."),
+    "en": ("Projects with the closest descriptions from the Uzbek startup database "
+           "(thepitch.uz, uzcombinator.uz). Not a verdict — open the links to check."),
+}
+_COMPETITOR_ADVANTAGE = {
+    "uz": "Ustunlik qilish yo'llari — bularni mahsulot qaroriga aylantiring:",
+    "ru": "Способы получить преимущество — превратите их в продуктовые решения:",
+    "en": "Ways to differentiate — turn these into product decisions:",
+}
+
+
+def _competitor_block(ctx: BuildContext) -> str:
+    """Topshiriqqa raqobat bo'limini qo'shadi.
+
+    Nega topshiriq ichida: "nima bilan farq qilamiz" degan javob mahsulot
+    qarorlariga aylanadi (qaysi funksiya birinchi, nimani umuman qilmaymiz).
+    Alohida hisobotda qolsa, u kodga aylanmaydi.
+
+    Dataset bo'lmasa bo'sh satr qaytadi — bo'lim shunchaki chiqmaydi.
+    """
+    try:
+        analysis = competitor_service.analyze(
+            description=ctx.description,
+            project_type=ctx.project_type,
+            signals=ctx.signals,
+            top_k=4,
+        )
+    except Exception:  # noqa: BLE001 — raqobat tahlili generatsiyani to'xtatmasin
+        logger.exception("Raqobat tahlili yiqildi — bo'lim o'tkazib yuborildi")
+        return ""
+
+    if not analysis.matches and not analysis.advantages:
+        return ""
+
+    lang = ctx.lang if ctx.lang in _COMPETITOR_HEADING else "uz"
+    lines = ["", "", f"<competition>", _COMPETITOR_HEADING[lang], ""]
+
+    if analysis.matches:
+        lines.append(_COMPETITOR_INTRO[lang])
+        lines.append("")
+        for m in analysis.matches:
+            link = m.url or m.profile_url
+            money = f" — {m.investment}" if m.investment else ""
+            lines.append(f"- {m.name} ({m.level}, {m.similarity:.2f}){money}")
+            lines.append(f"  {m.description[:180]}")
+            if link:
+                lines.append(f"  {link}")
+
+    if analysis.advantages:
+        lines += ["", _COMPETITOR_ADVANTAGE[lang], ""]
+        lines += [f"- {a}" for a in analysis.advantages]
+
+    if analysis.warnings:
+        lines.append("")
+        lines += [f"! {w}" for w in analysis.warnings]
+
+    lines += ["</competition>"]
+    return "\n".join(lines)
+
+
 async def generate(ctx: BuildContext) -> GeneratedPrompt:
     """Yakuniy promptni qaytaradi.
 
@@ -1254,6 +1324,8 @@ async def generate(ctx: BuildContext) -> GeneratedPrompt:
         }
         for h in hits
     ]
+
+    skeleton = skeleton + _competitor_block(ctx)
 
     if not get_settings().use_llm:
         # Ogohlantirish YO'Q: bu zaxira yo'l emas, asosiy yo'l. Ilgari shu
